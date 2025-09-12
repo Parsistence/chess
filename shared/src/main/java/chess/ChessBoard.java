@@ -10,7 +10,11 @@ public class ChessBoard {
     private final ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
-        
+        resetBoard();
+    }
+
+    public ChessBoard(ChessBoard otherBoard) {
+        System.arraycopy(board, 0, otherBoard.board, 0, board.length);
     }
 
     /**
