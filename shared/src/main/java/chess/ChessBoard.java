@@ -1,5 +1,8 @@
 package chess;
 
+import chess.ChessGame.TeamColor;
+import chess.ChessPiece.PieceType;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -14,7 +17,7 @@ public class ChessBoard {
     }
 
     public ChessBoard(ChessBoard otherBoard) {
-        System.arraycopy(board, 0, otherBoard.board, 0, board.length);
+        setBoard(otherBoard.board);
     }
 
     /**
@@ -53,10 +56,51 @@ public class ChessBoard {
     }
 
     /**
+     * Sets the board to the values in newBoard.
+     *
+     * @param newBoard the new board to copy into board.
+     */
+    public void setBoard(ChessPiece[][] newBoard) {
+        System.arraycopy(board, 0, newBoard, 0, board.length);
+    }
+
+    /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        var defaultBoard = new ChessPiece[8][8];
+
+        // Pawn rows
+        var whitePawns = defaultBoard[1];
+        var blackPawns = defaultBoard[6];
+        for (int i = 0; i < whitePawns.length; i++) {
+            whitePawns[i] = new ChessPiece(TeamColor.WHITE, PieceType.PAWN);
+            blackPawns[i] = new ChessPiece(TeamColor.BLACK, PieceType.PAWN);
+        }
+
+        // King + Elites rows
+        defaultBoard[0] = new ChessPiece[]{
+                new ChessPiece(TeamColor.WHITE, PieceType.ROOK),
+                new ChessPiece(TeamColor.WHITE, PieceType.KNIGHT),
+                new ChessPiece(TeamColor.WHITE, PieceType.BISHOP),
+                new ChessPiece(TeamColor.WHITE, PieceType.QUEEN),
+                new ChessPiece(TeamColor.WHITE, PieceType.KING),
+                new ChessPiece(TeamColor.WHITE, PieceType.BISHOP),
+                new ChessPiece(TeamColor.WHITE, PieceType.KNIGHT),
+                new ChessPiece(TeamColor.WHITE, PieceType.ROOK),
+        };
+        defaultBoard[7] = new ChessPiece[]{
+                new ChessPiece(TeamColor.BLACK, PieceType.ROOK),
+                new ChessPiece(TeamColor.BLACK, PieceType.KNIGHT),
+                new ChessPiece(TeamColor.BLACK, PieceType.BISHOP),
+                new ChessPiece(TeamColor.BLACK, PieceType.QUEEN),
+                new ChessPiece(TeamColor.BLACK, PieceType.KING),
+                new ChessPiece(TeamColor.BLACK, PieceType.BISHOP),
+                new ChessPiece(TeamColor.BLACK, PieceType.KNIGHT),
+                new ChessPiece(TeamColor.BLACK, PieceType.ROOK),
+        };
+
+        setBoard(defaultBoard);
     }
 }
