@@ -1,0 +1,25 @@
+package chess;
+
+public class Rule {
+
+    /**
+     * Initialize the rule with each direction the piece can potentially move, assuming
+     * the piece can move recursively.
+     * @param potentialMoves The potential spaces the piece can move,
+     *                       relative to the piece's current position on the board.
+     */
+    public Rule(int[][] potentialMoves) {
+        this(potentialMoves, true);
+    }
+
+    /**
+     * Initialize the rule with each direction the piece can potentially move.
+     * @param potentialMoves The potential spaces the piece can move,
+     *                       relative to the piece's current position on the board.
+     * @param recurseMoves If true, then the piece can move multiple spaces in any given
+     *                     direction.
+     */
+    public Rule(int[][] potentialMoves, boolean recurseMoves) {
+        throw new RuntimeException("Not implemented");
+    }
+}
