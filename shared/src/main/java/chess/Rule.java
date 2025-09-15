@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Collection;
+
 public class Rule {
 
     /**
@@ -20,6 +22,10 @@ public class Rule {
      *                     direction.
      */
     public Rule(int[][] potentialMoves, boolean recurseMoves) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition pos) {
         throw new RuntimeException("Not implemented");
     }
 }
