@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class Rule {
     private final int[][] potentialMoves;
-    private final boolean recurseMoves;
+    private final boolean repeatMoves;
 
     /**
      * Initialize the rule with each direction the piece can potentially move, assuming
@@ -25,12 +25,12 @@ public class Rule {
      * Initialize the rule with each direction the piece can potentially move.
      * @param potentialMoves The potential spaces the piece can move,
      *                       relative to the piece's current position on the board.
-     * @param recurseMoves If true, then the piece can move multiple spaces in any given
+     * @param repeatMoves If true, then the piece can move multiple spaces for any given
      *                     direction.
      */
-    public Rule(int[][] potentialMoves, boolean recurseMoves) {
+    public Rule(int[][] potentialMoves, boolean repeatMoves) {
         this.potentialMoves = potentialMoves;
-        this.recurseMoves = recurseMoves;
+        this.repeatMoves = repeatMoves;
     }
 
     public Collection<ChessMove> getMoves(
@@ -45,27 +45,30 @@ public class Rule {
             Collection<ChessMove> validMoves, ChessBoard board, ChessPosition pos, TeamColor teamColor
     ) {
         for (int[] potentialMove : potentialMoves) {
-            int row = pos.getRow() + potentialMove[0];
-            int col = pos.getColumn() + potentialMove[1];
-            var newPos = new ChessPosition(row, col);
+            for (
+                    var newPos = new ChessPosition(
+                            pos.getRow() + potentialMove[0],
+                            pos.getColumn() + potentialMove[1]
+                    );
+                    board.posInBounds(newPos);
+                    newPos = new ChessPosition(
+                            newPos.getRow() + potentialMove[0],
+                            newPos.getColumn() + potentialMove[1]
+                    )
+            ) {
+                // Return if space is occupied by a piece of the same color
+                ChessPiece thatPiece = board.getPiece(newPos);
+                if (thatPiece != null && thatPiece.getTeamColor() == teamColor) {
+                    return;
+                }
 
-            // Return if off the board
-            if (!board.posInBounds(newPos)) {
-                return;
-            }
+                // Create new ChessMove from new position and add to valid moves
+                validMoves.add(new ChessMove(pos, newPos));
 
-            // Return if space is occupied by a piece of the same color
-            ChessPiece thatPiece = board.getPiece(newPos);
-            if (thatPiece != null && thatPiece.getTeamColor() == teamColor) {
-                return;
-            }
-
-            // Create new ChessMove from new position and add to valid moves
-            validMoves.add(new ChessMove(pos, newPos));
-
-            // Recurse with new position if recurseMoves==true
-            if (recurseMoves) {
-                updateValidMoves(validMoves, board, newPos, teamColor);
+                // Don't repeat if recurseMoves==false
+                if (!repeatMoves) {
+                    return;
+                }
             }
         }
     }
@@ -76,19 +79,19 @@ public class Rule {
             return false;
         }
         Rule rule = (Rule) o;
-        return recurseMoves == rule.recurseMoves && Objects.deepEquals(potentialMoves, rule.potentialMoves);
+        return repeatMoves == rule.repeatMoves && Objects.deepEquals(potentialMoves, rule.potentialMoves);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(Arrays.deepHashCode(potentialMoves), recurseMoves);
+        return Objects.hash(Arrays.deepHashCode(potentialMoves), repeatMoves);
     }
 
     @Override
     public String toString() {
         return "Rule{" +
                 "potentialMoves=" + Arrays.toString(potentialMoves) +
-                ", recurseMoves=" + recurseMoves +
+                ", recurseMoves=" + repeatMoves +
                 '}';
     }
 }
