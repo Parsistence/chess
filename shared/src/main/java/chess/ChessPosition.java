@@ -49,7 +49,7 @@ public class ChessPosition {
     @Override
     public String toString() {
         return String.format(
-                "ChessPosition{%d, %d}",
+                "(%d, %d)",
                 row, col
         );
     }
