@@ -3,6 +3,8 @@ package chess;
 import java.util.Collection;
 
 public class Rule {
+    private final int[][] potentialMoves;
+    private final boolean recurseMoves;
 
     /**
      * Initialize the rule with each direction the piece can potentially move, assuming
@@ -22,7 +24,8 @@ public class Rule {
      *                     direction.
      */
     public Rule(int[][] potentialMoves, boolean recurseMoves) {
-        throw new RuntimeException("Not implemented");
+        this.potentialMoves = potentialMoves;
+        this.recurseMoves = recurseMoves;
     }
 
     public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition pos) {
