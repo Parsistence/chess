@@ -10,7 +10,7 @@ public class Rule {
      * @param potentialMoves The potential spaces the piece can move,
      *                       relative to the piece's current position on the board.
      */
-    public Rule(int[][] potentialMoves) {
+    public Rule(int[] potentialMoves) {
         this(potentialMoves, true);
     }
 
@@ -21,7 +21,7 @@ public class Rule {
      * @param recurseMoves If true, then the piece can move multiple spaces in any given
      *                     direction.
      */
-    public Rule(int[][] potentialMoves, boolean recurseMoves) {
+    public Rule(int[] potentialMoves, boolean recurseMoves) {
         throw new RuntimeException("Not implemented");
     }
 
