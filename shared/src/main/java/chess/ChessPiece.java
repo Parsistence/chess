@@ -54,7 +54,14 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition pos) {
         PieceType pieceType = getPieceType();
         Rule rule = switch (pieceType) {
-            case KING -> throw new RuntimeException("Not implemented");
+            case KING -> new Rule(
+                    new int[][]{
+                            {1, -1}, {1, 0}, {1, 1},
+                            {0, -1}, {0, 1},
+                            {-1, -1}, {-1, 0}, {-1, 1},
+                    },
+                    false
+            );
             case QUEEN -> throw new RuntimeException("Not implemented");
             case BISHOP -> new Rule(new int[][]{
                     {1, -1}, {1, 1}, {-1, -1}, {-1, 1}
