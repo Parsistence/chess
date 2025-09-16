@@ -84,7 +84,13 @@ public class ChessPiece {
                     },
                     false
             );
-            case ROOK -> throw new RuntimeException("Not implemented");
+            case ROOK -> new Rule(
+                    new int[][]{
+                            {1, 0},
+                            {0, -1}, {0, 1},
+                            {-1, 0},
+                    }
+            );
             case PAWN -> throw new RuntimeException("Not implemented");
         };
 
