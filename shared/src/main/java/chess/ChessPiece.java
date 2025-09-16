@@ -69,10 +69,6 @@ public class ChessPiece {
             case KNIGHT -> throw new RuntimeException("Not implemented");
             case ROOK -> throw new RuntimeException("Not implemented");
             case PAWN -> throw new RuntimeException("Not implemented");
-            default -> throw new RuntimeException(String.format(
-                    "Rule for piece type %s not implemented.",
-                    pieceType
-            ));
         };
 
         return rule.getMoves(board, pos, getTeamColor());
