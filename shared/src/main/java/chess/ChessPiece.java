@@ -69,10 +69,21 @@ public class ChessPiece {
                             {-1, -1}, {-1, 0}, {-1, 1},
                     }
             );
-            case BISHOP -> new Rule(new int[][]{
-                    {1, -1}, {1, 1}, {-1, -1}, {-1, 1}
-            });
-            case KNIGHT -> throw new RuntimeException("Not implemented");
+            case BISHOP -> new Rule(
+                    new int[][]{
+                            {1, -1}, {1, 1},
+                            {-1, -1}, {-1, 1},
+                    }
+            );
+            case KNIGHT -> new Rule(
+                    new int[][]{
+                            {2, -1}, {2, 1},
+                            {1, -2}, {1, 2},
+                            {-1, -2}, {-1, 2},
+                            {-2, -1}, {-2, 1},
+                    },
+                    false
+            );
             case ROOK -> throw new RuntimeException("Not implemented");
             case PAWN -> throw new RuntimeException("Not implemented");
         };
