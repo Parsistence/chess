@@ -56,7 +56,9 @@ public class ChessPiece {
         Rule rule = switch (pieceType) {
             case KING -> throw new RuntimeException("Not implemented");
             case QUEEN -> throw new RuntimeException("Not implemented");
-            case BISHOP -> throw new RuntimeException("Not implemented");
+            case BISHOP -> new Rule(new int[][]{
+                    {1, -1}, {1, 1}, {-1, -1}, {-1, 1}
+            });
             case KNIGHT -> throw new RuntimeException("Not implemented");
             case ROOK -> throw new RuntimeException("Not implemented");
             case PAWN -> throw new RuntimeException("Not implemented");
