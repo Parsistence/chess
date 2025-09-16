@@ -62,7 +62,13 @@ public class ChessPiece {
                     },
                     false
             );
-            case QUEEN -> throw new RuntimeException("Not implemented");
+            case QUEEN -> new Rule(
+                    new int[][]{
+                            {1, -1}, {1, 0}, {1, 1},
+                            {0, -1}, {0, 1},
+                            {-1, -1}, {-1, 0}, {-1, 1},
+                    }
+            );
             case BISHOP -> new Rule(new int[][]{
                     {1, -1}, {1, 1}, {-1, -1}, {-1, 1}
             });
