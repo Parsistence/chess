@@ -56,18 +56,23 @@ public class Rule {
                             newPos.getColumn() + potentialMove[1]
                     )
             ) {
-                // Return if space is occupied by a piece of the same color
+                // Break if space is occupied by a piece of the same color
                 ChessPiece thatPiece = board.getPiece(newPos);
                 if (thatPiece != null && thatPiece.getTeamColor() == teamColor) {
-                    return;
+                    break;
                 }
 
                 // Create new ChessMove from new position and add to valid moves
                 validMoves.add(new ChessMove(pos, newPos));
 
+                // Don't repeat if this move would capture an enemy
+                if (thatPiece != null) {
+                    break;
+                }
+
                 // Don't repeat if recurseMoves==false
                 if (!repeatMoves) {
-                    return;
+                    break;
                 }
             }
         }
