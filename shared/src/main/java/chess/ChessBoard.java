@@ -24,6 +24,20 @@ public class ChessBoard {
     }
 
     /**
+     * Checks a given position to see if it is on the board.
+     * @param pos The position to check.
+     * @return true if pos is on the board; false otherwise.
+     */
+    public boolean checkBounds(ChessPosition pos) {
+        try {
+            var _ = board[pos.getRow() - 1][pos.getColumn() - 1];
+        } catch (ArrayIndexOutOfBoundsException _ ) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Adds a chess piece to the chessboard
      *
      * @param position where to add the piece to
