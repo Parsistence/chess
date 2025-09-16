@@ -1,6 +1,9 @@
 package chess;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
 public class Rule {
     private final int[][] potentialMoves;
@@ -30,5 +33,26 @@ public class Rule {
 
     public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition pos) {
         throw new RuntimeException("Not implemented");
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Rule rule = (Rule) o;
+        return recurseMoves == rule.recurseMoves && Objects.deepEquals(potentialMoves, rule.potentialMoves);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Arrays.deepHashCode(potentialMoves), recurseMoves);
+    }
+
+    @Override
+    public String toString() {
+        return "Rule{" +
+                "potentialMoves=" + Arrays.toString(potentialMoves) +
+                ", recurseMoves=" + recurseMoves +
+                '}';
     }
 }
