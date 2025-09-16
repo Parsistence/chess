@@ -68,7 +68,7 @@ public class ChessPiece {
             ));
         };
 
-        return rule.getMoves(board, pos);
+        return rule.getMoves(board, pos, getTeamColor());
     }
 
     @Override

@@ -28,7 +28,7 @@ public class ChessBoard {
      * @param pos The position to check.
      * @return true if pos is on the board; false otherwise.
      */
-    public boolean checkBounds(ChessPosition pos) {
+    public boolean posInBounds(ChessPosition pos) {
         try {
             var _ = board[pos.getRow() - 1][pos.getColumn() - 1];
         } catch (ArrayIndexOutOfBoundsException _ ) {
