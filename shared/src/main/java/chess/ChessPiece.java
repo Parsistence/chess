@@ -91,7 +91,7 @@ public class ChessPiece {
                             {-1, 0},
                     }
             );
-            case PAWN -> throw new RuntimeException("Not implemented");
+            case PAWN -> new PawnRule();
         };
 
         return rule.getMoves(board, pos, getTeamColor());
