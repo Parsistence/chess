@@ -28,8 +28,8 @@ public class ChessBoard {
      */
     public boolean posInBounds(ChessPosition pos) {
         try {
-            var _ = board[pos.getRow() - 1][pos.getColumn() - 1];
-        } catch (ArrayIndexOutOfBoundsException _ ) {
+            var item = board[pos.getRow() - 1][pos.getColumn() - 1];
+        } catch (ArrayIndexOutOfBoundsException e ) {
             return false;
         }
         return true;
