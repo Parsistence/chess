@@ -15,9 +15,7 @@ import java.util.Objects;
 public class ChessBoard {
     private final ChessPiece[][] board = new ChessPiece[8][8];
 
-    public ChessBoard() {
-        resetBoard();
-    }
+    public ChessBoard() {}
 
     public ChessBoard(ChessBoard otherBoard) {
         setBoard(otherBoard.board);
@@ -90,7 +88,7 @@ public class ChessBoard {
      * @param newBoard the new board to copy into board.
      */
     public void setBoard(ChessPiece[][] newBoard) {
-        System.arraycopy(board, 0, newBoard, 0, board.length);
+        System.arraycopy(newBoard, 0, board, 0, board.length);
     }
 
     /**
