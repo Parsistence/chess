@@ -38,6 +38,18 @@ public class ChessBoard {
     }
 
     /**
+     * Gets the position of the corner farthest from the corner at (1,1).
+     * This can be helpful for accessing the length and width of the board.
+     * @return the ChessPosition of the farthest corner.
+     */
+    public ChessPosition getFarthestPos() {
+        return new ChessPosition(
+                board.length,
+                board[0].length
+        );
+    }
+
+    /**
      * Adds a chess piece to the chessboard
      *
      * @param position where to add the piece to
