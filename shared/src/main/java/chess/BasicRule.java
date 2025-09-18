@@ -32,6 +32,17 @@ public class BasicRule extends AbstractRule {
         this.repeatMoves = repeatMoves;
     }
 
+    /**
+     * Run validation checks for potential moves and store them in validMoves.
+     * This is meant to be called from Rule.getMoves, which returns validMoves.
+     * Potential moves are determined by BasicRule.potentialMoves.
+     * If BasicRule.repeatMoves is true, then updateValidMoves will be called
+     * repeatedly for each potential move.
+     * @param validMoves The Collection to store all valid moves.
+     * @param board The chessboard.
+     * @param pos The position of the chess piece.
+     * @param teamColor The team color the piece belongs to.
+     */
     @Override
     protected void updateValidMoves(
             Collection<ChessMove> validMoves, ChessBoard board, ChessPosition pos, TeamColor teamColor
