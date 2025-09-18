@@ -54,7 +54,7 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition pos) {
         PieceType pieceType = getPieceType();
         Rule rule = switch (pieceType) {
-            case KING -> new Rule(
+            case KING -> new BasicRule(
                     new int[][]{
                             {1, -1}, {1, 0}, {1, 1},
                             {0, -1}, {0, 1},
@@ -62,20 +62,20 @@ public class ChessPiece {
                     },
                     false
             );
-            case QUEEN -> new Rule(
+            case QUEEN -> new BasicRule(
                     new int[][]{
                             {1, -1}, {1, 0}, {1, 1},
                             {0, -1}, {0, 1},
                             {-1, -1}, {-1, 0}, {-1, 1},
                     }
             );
-            case BISHOP -> new Rule(
+            case BISHOP -> new BasicRule(
                     new int[][]{
                             {1, -1}, {1, 1},
                             {-1, -1}, {-1, 1},
                     }
             );
-            case KNIGHT -> new Rule(
+            case KNIGHT -> new BasicRule(
                     new int[][]{
                             {2, -1}, {2, 1},
                             {1, -2}, {1, 2},
@@ -84,7 +84,7 @@ public class ChessPiece {
                     },
                     false
             );
-            case ROOK -> new Rule(
+            case ROOK -> new BasicRule(
                     new int[][]{
                             {1, 0},
                             {0, -1}, {0, 1},
