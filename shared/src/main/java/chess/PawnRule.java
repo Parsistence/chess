@@ -78,4 +78,9 @@ public class PawnRule extends AbstractRule {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return "PawnRule{}";
+    }
 }
