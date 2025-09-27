@@ -4,9 +4,10 @@ import chess.ChessGame.TeamColor;
 import chess.ChessPiece.PieceType;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.function.Consumer;
 
-public class PawnRule extends AbstractRule {
+public class PawnRule implements Rule {
     private final PieceType[] promotionPieces = {
             PieceType.QUEEN, PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK
     };
@@ -21,13 +22,16 @@ public class PawnRule extends AbstractRule {
      *     <li><b>Forward diagonal</b> (must be capturing an enemy piece)</li>
      *     <li><b>Pawn promotion</b> (tested in all cases above)</li>
      * <ul/>
-     * @param validMoves The collection to store all valid moves.
      * @param board The chessboard.
      * @param pos The current position of the pawn.
      * @param teamColor The team color the pawn belongs to.
      */
     @Override
-    protected void updateValidMoves(Collection<ChessMove> validMoves, ChessBoard board, ChessPosition pos, TeamColor teamColor) {
+    public Collection<ChessMove> getMoves(
+            ChessBoard board, ChessPosition pos, TeamColor teamColor
+    ) {
+        var validMoves = new HashSet<ChessMove>();
+
         // Get promotion row from team color
         int promotionRow = (teamColor == TeamColor.WHITE) ? board.numRows() : 1;
 
@@ -77,6 +81,8 @@ public class PawnRule extends AbstractRule {
                 tryPromotion.accept(diagonalPos);
             }
         }
+
+        return validMoves;
     }
 
     @Override

@@ -2,11 +2,9 @@ package chess;
 
 import chess.ChessGame.TeamColor;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
-public class BasicRule extends AbstractRule {
+public class BasicRule implements Rule {
     private final int[][] potentialMoves;
     private final boolean repeatMoves;
 
@@ -33,20 +31,19 @@ public class BasicRule extends AbstractRule {
     }
 
     /**
-     * Run validation checks for potential moves and store them in validMoves.
-     * This is meant to be called from Rule.getMoves, which returns validMoves.
-     * Potential moves are determined by BasicRule.potentialMoves.
-     * If BasicRule.repeatMoves is true, then updateValidMoves will be called
-     * repeatedly for each potential move.
-     * @param validMoves The Collection to store all valid moves.
-     * @param board The chessboard.
-     * @param pos The position of the chess piece.
+     * Get all possible moves a chess piece can make.
+     *
+     * @param board     The chessboard.
+     * @param pos       The position of the chess piece.
      * @param teamColor The team color the piece belongs to.
+     * @return A Collection of all valid moves.
      */
     @Override
-    protected void updateValidMoves(
-            Collection<ChessMove> validMoves, ChessBoard board, ChessPosition pos, TeamColor teamColor
+    public Collection<ChessMove> getMoves(
+            ChessBoard board, ChessPosition pos, TeamColor teamColor
     ) {
+        var validMoves = new HashSet<ChessMove>();
+
         for (int[] potentialMove : potentialMoves) {
             for (
                     var newPos = new ChessPosition(
@@ -79,6 +76,8 @@ public class BasicRule extends AbstractRule {
                 }
             }
         }
+
+        return validMoves;
     }
 
     @Override
