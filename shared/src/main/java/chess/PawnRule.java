@@ -29,7 +29,7 @@ public class PawnRule extends AbstractRule {
     @Override
     protected void updateValidMoves(Collection<ChessMove> validMoves, ChessBoard board, ChessPosition pos, TeamColor teamColor) {
         // Get promotion row from team color
-        int promotionRow = (teamColor == TeamColor.WHITE) ? board.getFarthestPos().getRow() : 1;
+        int promotionRow = (teamColor == TeamColor.WHITE) ? board.numRows() : 1;
 
         // Get move direction from team color
         int forwardDir = (teamColor == TeamColor.WHITE) ? 1 : -1;
@@ -54,7 +54,7 @@ public class PawnRule extends AbstractRule {
             if (
                     pos.getRow() == ((teamColor == TeamColor.WHITE) ?
                             2 :
-                            board.getFarthestPos().getRow() - 1)
+                            board.numRows() - 1)
             ) {
                 var doubleForward = new ChessPosition(pos.getRow() + 2 * forwardDir, pos.getColumn());
                 if (board.posInBounds(doubleForward) && board.getPiece(doubleForward) == null) {

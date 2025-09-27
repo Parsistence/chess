@@ -36,15 +36,19 @@ public class ChessBoard {
     }
 
     /**
-     * Gets the position of the corner farthest from the corner at (1,1).
-     * This can be helpful for accessing the length and width of the board.
-     * @return the ChessPosition of the farthest corner.
+     * Get the number of rows on the board.
+     * @return The number of rows on the board.
      */
-    public ChessPosition getFarthestPos() {
-        return new ChessPosition(
-                board.length,
-                board[0].length
-        );
+    public int numRows() {
+        return board.length;
+    }
+
+    /**
+     * Get the number of columns on the board.
+     * @return The number of columns on the board.
+     */
+    public int numCols() {
+        return board[0].length;
     }
 
     /**
