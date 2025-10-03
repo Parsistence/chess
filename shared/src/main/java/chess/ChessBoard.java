@@ -4,6 +4,7 @@ import chess.ChessGame.TeamColor;
 import chess.ChessPiece.PieceType;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -105,8 +106,8 @@ public class ChessBoard {
      * Makes a move on the board according to the given ChessMove if the move is valid.
      * The move is invalid if:
      * <ul>
+     *     <li>The start or end positions are out of bounds.</li>
      *     <li>No piece exists at the starting position.</li>
-     *     <li>The end position is off the board.</li>
      *     <li>The move is not part of the piece's collection of valid piece moves.</li>
      * </ul>
      *
@@ -114,7 +115,40 @@ public class ChessBoard {
      * @throws InvalidMoveException if the move is invalid.
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        // Invalid if start or end positions are out of bounds
+        ChessPosition startPos = move.getStartPosition();
+        ChessPosition endPos = move.getEndPosition();
+        if (!posInBounds(startPos)) {
+            throw new InvalidMoveException(String.format(
+                    "Start position of move (%s) is out of bounds", startPos
+            ));
+        }
+        if (!posInBounds(endPos)) {
+            throw new InvalidMoveException(String.format(
+                    "End position of move (%s) is out of bounds", endPos
+            ));
+        }
+
+        // Invalid if start position does not contain a piece
+        ChessPiece piece = getPiece(startPos);
+        if (piece == null) {
+            throw new InvalidMoveException(String.format(
+                    "No piece located at start position %s", startPos
+            ));
+        }
+
+        // Invalid if move is not in piece's valid moves
+        Collection<ChessMove> pieceMoves = piece.pieceMoves(this, startPos);
+        if (!pieceMoves.contains(move)) {
+            throw new InvalidMoveException(String.format(
+                    "The given chess move (%s) is not a valid move for piece %s",
+                    move, piece
+            ));
+        }
+
+        // All checks passed -> make the move
+        addPiece(endPos, piece);
+        removePiece(startPos);
     }
 
     /**
