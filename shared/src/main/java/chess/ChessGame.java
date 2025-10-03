@@ -268,4 +268,12 @@ public class ChessGame {
     public int hashCode() {
         return Objects.hash(board, teamTurn);
     }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "board=" + board +
+                ", teamTurn=" + teamTurn +
+                '}';
+    }
 }
