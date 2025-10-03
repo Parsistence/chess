@@ -3,6 +3,7 @@ package chess;
 import chess.ChessPiece.PieceType;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -54,26 +55,31 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        Collection<ChessMove> validMoves = new HashSet<>();
+
         ChessPiece piece = board.getPiece(startPosition);
 
         if (piece == null) {
             return null;
         }
 
-        Collection<ChessMove> validMoves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> potentialMoves = piece.pieceMoves(board, startPosition);
 
-        ChessBoard boardClone = new ChessBoard(board); // copy current state of board
+        // copy current state of board
+        ChessBoard boardClone = new ChessBoard(board);
+        TeamColor teamTurnClone = this.teamTurn;
 
-        for (ChessMove potentialMove : validMoves) {
+        // Validate all potential moves
+        for (ChessMove potentialMove : potentialMoves) {
             // Test potential move and remove it if it is invalid
             try {
-                makeMove(potentialMove);
-            } catch (InvalidMoveException e) {
-                validMoves.remove(potentialMove);
-            }
+                tryMove(potentialMove, false);
+                validMoves.add(potentialMove);
+            } catch (InvalidMoveException e) {}
 
-            // Reset board to before test move was made
+            // Reset board and team turn to before test move was made
             board = new ChessBoard(boardClone);
+            teamTurn = teamTurnClone;
         }
 
         return validMoves;
@@ -94,7 +100,7 @@ public class ChessGame {
 
         // Try to make the move
         try {
-            tryMove(move);
+            tryMove(move, true);
         } catch (InvalidMoveException e) {
             // If move was invalid, reset the board and pass along the exception
             board = new ChessBoard(boardClone);
@@ -118,9 +124,11 @@ public class ChessGame {
      * </ul>
      *
      * @param move chess move to perform
+     * @param validateTeamColor if true, check to make sure the team color is correct
+     *                          and update teamTurn if move is successful
      * @throws InvalidMoveException if move is invalid
      */
-    private void tryMove(ChessMove move) throws InvalidMoveException {
+    private void tryMove(ChessMove move, boolean validateTeamColor) throws InvalidMoveException {
         // Get start position and piece
         ChessPosition startPos = move.getStartPosition();
         ChessPiece piece = (board.posInBounds(startPos)) ?
@@ -135,8 +143,9 @@ public class ChessGame {
         }
 
         // Invalid if the piece's team color does not match the current team's color
+        // Only check this if validateTeamColor == true
         TeamColor pieceColor = piece.getTeamColor();
-        if (pieceColor != teamTurn) {
+        if (validateTeamColor && pieceColor != teamTurn) {
             throw new InvalidMoveException(String.format(
                     "Attempted to move %s piece %s on %s team's turn",
                     pieceColor, piece, teamTurn
@@ -147,15 +156,17 @@ public class ChessGame {
         board.makeMove(move);
 
         // Invalid if making the move puts the current team in check
-        if (isInCheck(teamTurn)) {
+        if (isInCheck(pieceColor)) {
             throw new InvalidMoveException(String.format(
                     "Attempted a move with %s piece %s that would put their team in check",
                     pieceColor, piece
             ));
         }
 
-        // All checks have passed -> update teamTurn
-        teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        // All checks have passed -> update teamTurn (only if validateTeamColor==true)
+        if (validateTeamColor) {
+            teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        }
     }
 
     /**
@@ -178,7 +189,7 @@ public class ChessGame {
             Collection<ChessMove> pieceMoves = piece.pieceMoves(board, pos);
             for (ChessMove pieceMove : pieceMoves) {
                 ChessPosition endPos = pieceMove.getEndPosition();
-                if (endPos == kingPos) {
+                if (endPos.equals(kingPos)) {
                     return true;
                 }
             }
