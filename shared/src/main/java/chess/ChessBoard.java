@@ -104,6 +104,7 @@ public class ChessBoard {
 
     /**
      * Makes a move on the board according to the given ChessMove if the move is valid.
+     * <br><br>
      * The move is invalid if:
      * <ul>
      *     <li>The start or end positions are out of bounds.</li>
