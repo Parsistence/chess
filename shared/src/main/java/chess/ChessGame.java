@@ -77,7 +77,10 @@ public class ChessGame {
     }
 
     /**
-     * Makes a move in a chess game
+     * Makes a move in a chess game.
+     * <br><br>
+     * If the move is invalid, reverts the board to before the move was made and throws
+     * an exception.
      *
      * @param move chess move to perform
      * @throws InvalidMoveException if move is invalid
