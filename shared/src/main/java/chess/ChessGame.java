@@ -83,6 +83,35 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        // Make a copy of the board's state
+        var boardClone = new ChessBoard(board);
+
+        // Try to make the move
+        try {
+            tryMove(move);
+        } catch (InvalidMoveException e) {
+            // If move was invalid, reset the board and pass along the exception
+            board = new ChessBoard(boardClone);
+            throw e;
+        }
+
+    }
+
+    /**
+     * Tries to make a move.
+     * Does not revert the board if move is invalid partway through.
+     * <br><br>
+     * The move is invalid if:
+     * <ul>
+     *     <li>board.makeMove() throws an InvalidMoveException</li>
+     *     <li>The piece's team color does not match the current team's color.</li>
+     *     <li>The corresponding team's king is in check after the move.</li>
+     * </ul>
+     *
+     * @param move chess move to perform
+     * @throws InvalidMoveException if move is invalid
+     */
+    private void tryMove(ChessMove move) throws InvalidMoveException {
         throw new RuntimeException("Not implemented");
     }
 
