@@ -263,6 +263,19 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return "ChessBoard" + Arrays.toString(board);
+        StringBuilder str = new StringBuilder("ChessBoard{");
+
+        str.append("[");
+        for (ChessPiece[] pieceArr : board) {
+            str.append("[");
+            for (ChessPiece piece: pieceArr) {
+                str.append((piece != null) ? piece.toString() : "null").append(", ");
+            }
+            str.append("], ");
+        }
+        str.append("]");
+
+        str.append("}");
+        return str.toString();
     }
 }
