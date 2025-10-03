@@ -3,7 +3,6 @@ package chess;
 import chess.ChessPiece.PieceType;
 
 import java.util.Collection;
-import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -170,7 +169,7 @@ public class ChessGame {
 
         // Get all spaces occupied by opposing team color
         TeamColor enemyTeam = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        Collection<ChessPosition> enemyPositions = board.getOccupied(enemyTeam);
+        Collection<ChessPosition> enemyPositions = board.getOccupiedPositions(enemyTeam);
 
         // Return true if any enemy piece can capture the king
         for (ChessPosition pos : enemyPositions) {
@@ -201,7 +200,7 @@ public class ChessGame {
         }
 
         // Any valid moves -> not in checkmate
-        Collection<ChessPosition> teamPositions = board.getOccupied(teamColor);
+        Collection<ChessPosition> teamPositions = board.getOccupiedPositions(teamColor);
         for (ChessPosition pos : teamPositions) {
             if (!validMoves(pos).isEmpty()) {
                 return false;

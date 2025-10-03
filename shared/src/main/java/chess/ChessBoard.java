@@ -109,7 +109,7 @@ public class ChessBoard {
      * @param teamColor The team color to check for.
      * @return A collection of all spaces occupied by the given team color.
      */
-    public Collection<ChessPosition> getOccupied(TeamColor teamColor) {
+    public Collection<ChessPosition> getOccupiedPositions(TeamColor teamColor) {
         Collection<ChessPosition> occupiedSpaces = new HashSet<>();
 
         for (int r = 1; r <= numRows(); r++) {
@@ -134,7 +134,7 @@ public class ChessBoard {
      */
     public ChessPosition findFirstPiece(PieceType pieceType, TeamColor teamColor) {
         // Get all positions that match the team color
-        Collection<ChessPosition> teamPositions = getOccupied(teamColor);
+        Collection<ChessPosition> teamPositions = getOccupiedPositions(teamColor);
 
         // Return the first match found
         for (ChessPosition pos : teamPositions) {
