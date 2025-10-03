@@ -1,5 +1,7 @@
 package chess;
 
+import chess.ChessPiece.PieceType;
+
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -163,7 +165,27 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // Get position of king
+        ChessPosition kingPos = board.findFirstPiece(PieceType.KING, teamColor);
+
+        // Get all spaces occupied by opposing team color
+        TeamColor enemyTeam = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        Collection<ChessPosition> enemyPositions = board.getOccupied(enemyTeam);
+
+        // Return true if any enemy piece can capture the king
+        for (ChessPosition pos : enemyPositions) {
+            ChessPiece piece = board.getPiece(pos);
+            Collection<ChessMove> pieceMoves = piece.pieceMoves(board, pos);
+            for (ChessMove pieceMove : pieceMoves) {
+                ChessPosition endPos = pieceMove.getEndPosition();
+                if (endPos == kingPos) {
+                    return true;
+                }
+            }
+        }
+
+        // No pieces can capture the king -> return false
+        return false;
     }
 
     /**
