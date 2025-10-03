@@ -157,28 +157,6 @@ public class ChessGame {
     }
 
     /**
-     * Get all spaces on the chessboard occupied by a certain team color.
-     *
-     * @param teamColor The team color to check for.
-     * @return A collection of all spaces occupied by the given team color.
-     */
-    public Collection<ChessPosition> getOccupied(TeamColor teamColor) {
-        Collection<ChessPosition> occupiedSpaces = new HashSet<>();
-
-        for (int r = 1; r <= board.numRows(); r++) {
-            for (int c = 1; c <= board.numCols(); c++) {
-                ChessPosition pos = new ChessPosition(r, c);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    occupiedSpaces.add(pos);
-                }
-            }
-        }
-
-        return occupiedSpaces;
-    }
-
-    /**
      * Determines if the given team is in check
      *
      * @param teamColor which team to check for check
