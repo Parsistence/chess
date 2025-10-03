@@ -87,6 +87,22 @@ public class ChessBoard {
     }
 
     /**
+     * Makes a move on the board according to the given ChessMove if the move is valid.
+     * The move is invalid if:
+     * <ul>
+     *     <li>No piece exists at the starting position.</li>
+     *     <li>The end position is off the board.</li>
+     *     <li>The move is not part of the piece's collection of valid piece moves.</li>
+     * </ul>
+     *
+     * @param move The ChessMove to be made.
+     * @throws InvalidMoveException if the move is invalid.
+     */
+    public void makeMove(ChessMove move) throws InvalidMoveException {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
      * Sets the board to the values in newBoard.
      *
      * @param newBoard the new board to copy into board.
