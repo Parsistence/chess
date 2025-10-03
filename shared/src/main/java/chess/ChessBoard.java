@@ -204,7 +204,9 @@ public class ChessBoard {
      * @param newBoard the new board to copy into board.
      */
     public void setBoard(ChessPiece[][] newBoard) {
-        System.arraycopy(newBoard, 0, board, 0, board.length);
+        for (int i = 0; i < board.length; i++) {
+            board[i] = Arrays.copyOf(newBoard[i], board.length);
+        }
     }
 
     /**
