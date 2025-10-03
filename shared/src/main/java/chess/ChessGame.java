@@ -9,16 +9,21 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
+    private ChessBoard board;
+    private TeamColor teamTurn;
 
     public ChessGame() {
+        this.board = new ChessBoard();
+        this.board.resetBoard();
 
+        this.teamTurn = TeamColor.WHITE;
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return teamTurn;
     }
 
     /**
@@ -27,7 +32,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        teamTurn = team;
     }
 
     /**
@@ -46,7 +51,29 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+
+        if (piece == null) {
+            return null;
+        }
+
+        Collection<ChessMove> validMoves = piece.pieceMoves(board, startPosition);
+
+        ChessBoard boardClone = new ChessBoard(board); // copy current state of board
+
+        for (ChessMove potentialMove : validMoves) {
+            // Test potential move and remove it if it is invalid
+            try {
+                makeMove(potentialMove);
+            } catch (InvalidMoveException e) {
+                validMoves.remove(potentialMove);
+            }
+
+            // Reset board to before test move was made
+            board = new ChessBoard(boardClone);
+        }
+
+        return validMoves;
     }
 
     /**
