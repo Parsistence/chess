@@ -193,8 +193,12 @@ public class ChessBoard {
             ));
         }
 
-        // All checks passed -> make the move
-        addPiece(endPos, piece);
+        // All checks passed -> make the move, handling promotion if applicable
+        PieceType promotionPiece = move.getPromotionPiece();
+        var newPiece = (promotionPiece != null) ?
+                new ChessPiece(piece.getTeamColor(), promotionPiece) :
+                piece;
+        addPiece(endPos, newPiece);
         removePiece(startPos);
     }
 
