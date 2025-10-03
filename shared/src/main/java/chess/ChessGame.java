@@ -106,8 +106,9 @@ public class ChessGame {
      * <br><br>
      * The move is invalid if:
      * <ul>
-     *     <li>board.makeMove() throws an InvalidMoveException</li>
+     *     <li>No piece exists at the starting position.</li>
      *     <li>The piece's team color does not match the current team's color.</li>
+     *     <li>board.makeMove() throws an InvalidMoveException</li>
      *     <li>The corresponding team's king is in check after the move.</li>
      * </ul>
      *
