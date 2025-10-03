@@ -126,6 +126,29 @@ public class ChessBoard {
     }
 
     /**
+     * Finds the first piece on the board that matches the given criteria.
+     *
+     * @param pieceType The type of piece to find.
+     * @param teamColor The team color the piece belongs to.
+     * @return A ChessPosition of the first piece found; null otherwise
+     */
+    public ChessPosition findFirstPiece(PieceType pieceType, TeamColor teamColor) {
+        // Get all positions that match the team color
+        Collection<ChessPosition> teamPositions = getOccupied(teamColor);
+
+        // Return the first match found
+        for (ChessPosition pos : teamPositions) {
+            ChessPiece piece = getPiece(pos);
+            if (piece.getPieceType() == pieceType) {
+                return pos;
+            }
+        }
+
+        // No piece found -> return null
+        return null;
+    }
+
+    /**
      * Makes a move on the board according to the given ChessMove if the move is valid.
      * <br><br>
      * The move is invalid if:
