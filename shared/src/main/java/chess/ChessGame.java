@@ -101,22 +101,58 @@ public class ChessGame {
     }
 
     /**
-     * Tries to make a move.
-     * Does not revert the board if move is invalid partway through.
+     * Tries to make a move and updates the current team's turn if successful.
+     * <br><br>
+     * Does not revert the board if move is invalid,
+     * but will throw an exception.
      * <br><br>
      * The move is invalid if:
      * <ul>
      *     <li>No piece exists at the starting position.</li>
      *     <li>The piece's team color does not match the current team's color.</li>
-     *     <li>board.makeMove() throws an InvalidMoveException</li>
-     *     <li>The corresponding team's king is in check after the move.</li>
+     *     <li>board.makeMove() throws an InvalidMoveException.</li>
+     *     <li>Making the move puts the current team in check.</li>
      * </ul>
      *
      * @param move chess move to perform
      * @throws InvalidMoveException if move is invalid
      */
     private void tryMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        // Get start position and piece
+        ChessPosition startPos = move.getStartPosition();
+        ChessPiece piece = (board.posInBounds(startPos)) ?
+                board.getPiece(startPos) :
+                null; // null if not in bounds
+
+        // Invalid if no piece exists at the starting position
+        if (piece == null) {
+            throw new InvalidMoveException(String.format(
+                    "No piece located at start position %s", startPos
+            ));
+        }
+
+        // Invalid if the piece's team color does not match the current team's color
+        TeamColor pieceColor = piece.getTeamColor();
+        if (pieceColor != teamTurn) {
+            throw new InvalidMoveException(String.format(
+                    "Attempted to move %s piece %s on %s team's turn",
+                    pieceColor, piece, teamTurn
+            ));
+        }
+
+        // Attempt board.makeMove() (may throw an InvalidMoveException)
+        board.makeMove(move);
+
+        // Invalid if making the move puts the current team in check
+        if (isInCheck(teamTurn)) {
+            throw new InvalidMoveException(String.format(
+                    "Attempted a move with %s piece %s that would put their team in check",
+                    pieceColor, piece
+            ));
+        }
+
+        // All checks have passed -> update teamTurn
+        teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     /**
