@@ -1,15 +1,19 @@
 package server;
 
 import com.google.gson.Gson;
+import datamodel.RegistrationResult;
+import datamodel.User;
 import io.javalin.*;
 import io.javalin.http.Context;
 import org.jetbrains.annotations.NotNull;
+import service.UserService;
 
 import java.util.Map;
 
 public class Server {
 
     private final Javalin server;
+    private final UserService userService = new UserService();
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
@@ -23,11 +27,11 @@ public class Server {
 
     private void register(Context ctx) {
         var serializer = new Gson();
-        var req = serializer.fromJson(ctx.body(), Map.class);
+        var req = serializer.fromJson(ctx.body(), User.class);
 
-        // TODO: Get actual result from services
+        // call to the service and register
+        RegistrationResult res = userService.register(req);
 
-        var res = Map.of("username", req.get("username"), "authToken", "foo");
         ctx.result(serializer.toJson(res));
     }
 
