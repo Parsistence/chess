@@ -24,9 +24,11 @@ public class Server {
     private void register(Context ctx) {
         var serializer = new Gson();
         var req = serializer.fromJson(ctx.body(), Map.class);
-        req.put("authToken", "foo"); // TODO: Placeholder here
-        String res = serializer.toJson(req);
-        ctx.result(res);
+
+        // TODO: Get actual result from services
+
+        var res = Map.of("username", req.get("username"), "authToken", "foo");
+        ctx.result(serializer.toJson(res));
     }
 
     public int run(int desiredPort) {
