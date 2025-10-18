@@ -7,18 +7,21 @@ import datamodel.RegistrationResult;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
+import service.AuthService;
 import service.UserService;
 
 public class Server {
 
     private final Javalin server;
     private final UserService userService;
+    private final AuthService authService;
     private final DataAccess dataAccess;
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
         dataAccess = new MemoryDataAccess();
-        userService = new UserService(dataAccess);
+        authService = new AuthService();
+        userService = new UserService(authService, dataAccess);
 
         // Register your endpoints and exception handlers here.
 

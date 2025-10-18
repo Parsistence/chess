@@ -5,15 +5,16 @@ import datamodel.RegistrationResult;
 import datamodel.UserData;
 
 public class UserService {
+    private final AuthService authService;
     private final DataAccess dataAccess;
 
-    public UserService(DataAccess dataAccess) {
+    public UserService(AuthService authService, DataAccess dataAccess) {
+        this.authService = authService;
         this.dataAccess = dataAccess;
     }
 
     public RegistrationResult register(UserData userData) {
-        // TODO: Implement this
         dataAccess.saveUser(userData);
-        return new RegistrationResult(userData.username(), "foo");
+        return new RegistrationResult(userData.username(), authService.generateToken());
     }
 }
