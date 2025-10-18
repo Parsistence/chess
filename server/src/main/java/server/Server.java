@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
 import model.AuthData;
 import model.UserData;
@@ -35,7 +36,12 @@ public class Server {
         UserData req = serializer.fromJson(ctx.body(), UserData.class);
 
         // call to the service and register
-        AuthData res = userService.register(req);
+        AuthData res = null;
+        try {
+            res = userService.register(req);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Exception handling not implemented: " + e); // TODO
+        }
 
         ctx.result(serializer.toJson(res));
     }

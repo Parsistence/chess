@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 
@@ -13,7 +14,7 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public AuthData register(UserData userData) {
+    public AuthData register(UserData userData) throws DataAccessException {
         dataAccess.insertUser(userData);
         return new AuthData(userData.username(), authService.generateToken());
     }
