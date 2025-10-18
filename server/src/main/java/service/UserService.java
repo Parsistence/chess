@@ -2,7 +2,7 @@ package service;
 
 import dataaccess.DataAccess;
 import datamodel.RegistrationResult;
-import datamodel.User;
+import datamodel.UserData;
 
 public class UserService {
     private final DataAccess dataAccess;
@@ -11,9 +11,9 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public RegistrationResult register(User user) {
+    public RegistrationResult register(UserData userData) {
         // TODO: Implement this
-        dataAccess.saveUser(user);
-        return new RegistrationResult(user.username(), "foo");
+        dataAccess.saveUser(userData);
+        return new RegistrationResult(userData.username(), "foo");
     }
 }

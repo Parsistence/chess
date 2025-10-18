@@ -4,13 +4,10 @@ import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
 import datamodel.RegistrationResult;
-import datamodel.User;
+import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
-import org.jetbrains.annotations.NotNull;
 import service.UserService;
-
-import java.util.Map;
 
 public class Server {
 
@@ -32,7 +29,7 @@ public class Server {
 
     private void register(Context ctx) {
         var serializer = new Gson();
-        var req = serializer.fromJson(ctx.body(), User.class);
+        UserData req = serializer.fromJson(ctx.body(), UserData.class);
 
         // call to the service and register
         RegistrationResult res = userService.register(req);
