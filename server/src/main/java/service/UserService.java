@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
-import datamodel.RegistrationResult;
+import datamodel.AuthData;
 import datamodel.UserData;
 
 public class UserService {
@@ -13,8 +13,8 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public RegistrationResult register(UserData userData) {
+    public AuthData register(UserData userData) {
         dataAccess.saveUser(userData);
-        return new RegistrationResult(userData.username(), authService.generateToken());
+        return new AuthData(userData.username(), authService.generateToken());
     }
 }

@@ -3,7 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
-import datamodel.RegistrationResult;
+import datamodel.AuthData;
 import datamodel.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -35,7 +35,7 @@ public class Server {
         UserData req = serializer.fromJson(ctx.body(), UserData.class);
 
         // call to the service and register
-        RegistrationResult res = userService.register(req);
+        AuthData res = userService.register(req);
 
         ctx.result(serializer.toJson(res));
     }
