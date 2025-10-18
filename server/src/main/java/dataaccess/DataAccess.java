@@ -1,6 +1,6 @@
 package dataaccess;
 
-import datamodel.UserData;
+import model.UserData;
 
 public interface DataAccess {
     void saveUser(UserData userData);
