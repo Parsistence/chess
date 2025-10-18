@@ -14,7 +14,7 @@ public class UserService {
     }
 
     public AuthData register(UserData userData) {
-        dataAccess.createUser(userData);
+        dataAccess.insertUser(userData);
         return new AuthData(userData.username(), authService.generateToken());
     }
 }
