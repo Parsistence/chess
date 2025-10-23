@@ -10,6 +10,7 @@ import model.GameData;
 import model.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
+import org.jetbrains.annotations.NotNull;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
@@ -39,12 +40,35 @@ public class Server {
         server.post("session", this::login);
         server.delete("session", this::logout);
         server.get("game", this::listGames);
+        server.post("game", this::createGame);
 
+    }
+
+    private void createGame(Context ctx) {
+        String authToken = ctx.header("authorization");
+        if (!authService.verifyAuth(authToken)) {
+            ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            return;
+        }
+
+        CreateGameRequest req = serializer.fromJson(ctx.body(), CreateGameRequest.class);
+        if (req.gameName() == null) {
+            ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+            return;
+        }
+
+        CreateGameResponse res;
+        try {
+            res = gameService.createGame(req.gameName());
+        } catch (Exception e) {
+            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
+            return;
+        }
+        ctx.result(serializer.toJson(res));
     }
 
     private void listGames(Context ctx) {
         String authToken = ctx.header("authorization");
-
         if (!authService.verifyAuth(authToken)) {
             ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             return;
