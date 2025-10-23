@@ -6,12 +6,15 @@ import dataaccess.EntryAlreadyExistsException;
 import dataaccess.EntryNotFoundException;
 import dataaccess.MemoryDataAccess;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
+
+import java.util.Collection;
 
 public class Server {
 
@@ -35,7 +38,20 @@ public class Server {
         server.post("user", this::register);
         server.post("session", this::login);
         server.delete("session", this::logout);
+        server.get("game", this::listGames);
 
+    }
+
+    private void listGames(Context ctx) {
+        String authToken = ctx.header("authorization");
+
+        if (!authService.verifyAuth(authToken)) {
+            ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            return;
+        }
+
+        Collection<GameData> games = gameService.listGames();
+        ctx.result(serializer.toJson(games));
     }
 
     private void logout(Context ctx) {
