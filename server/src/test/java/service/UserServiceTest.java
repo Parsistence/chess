@@ -14,7 +14,7 @@ class UserServiceTest {
     @Test
     void registerNewUser() throws EntryNotFoundException {
         DataAccess dataAccess = new MemoryDataAccess();
-        AuthService authService = new AuthService();
+        AuthService authService = new AuthService(dataAccess);
         UserService userService = new UserService(authService, dataAccess);
 
         UserData user = new UserData(
@@ -38,7 +38,7 @@ class UserServiceTest {
     @Test
     void usernameAlreadyTaken() {
         DataAccess dataAccess = new MemoryDataAccess();
-        AuthService authService = new AuthService();
+        AuthService authService = new AuthService(dataAccess);
         UserService userService = new UserService(authService, dataAccess);
 
         UserData user = new UserData(
