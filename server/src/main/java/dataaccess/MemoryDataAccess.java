@@ -31,14 +31,14 @@ public class MemoryDataAccess implements DataAccess {
      *
      * @param username The username of the user whose data is to be retrieved.
      * @return A UserData object corresponding to the given username.
-     * @throws DataAccessException If the user data does not exist in the data store.
+     * @throws EntryNotFoundException If the user data does not exist in the data store.
      */
     @Override
-    public UserData getUser(String username) throws DataAccessException {
+    public UserData getUser(String username) throws EntryNotFoundException {
         UserData userData = users.get(username);
 
         if (userData == null) {
-            throw new DataAccessException(
+            throw new EntryNotFoundException(
                     "Tried to get an existing user with username " + username + ", but there is no user registered with that name"
             );
         }

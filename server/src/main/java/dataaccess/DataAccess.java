@@ -16,7 +16,7 @@ public interface DataAccess {
      *
      * @param username The username of the user whose data is to be retrieved.
      * @return A UserData object corresponding to the given username.
-     * @throws DataAccessException If the user data was unable to be retrieved from the data store.
+     * @throws EntryNotFoundException If the user data was unable to be retrieved from the data store.
      */
-    UserData getUser(String username) throws DataAccessException;
+    UserData getUser(String username) throws EntryNotFoundException;
 }
