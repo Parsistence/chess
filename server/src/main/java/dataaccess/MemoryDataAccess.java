@@ -1,5 +1,7 @@
 package dataaccess;
 
+import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
@@ -7,6 +9,18 @@ import java.util.Objects;
 
 public class MemoryDataAccess implements DataAccess {
     private final HashMap<String, UserData> users = new HashMap<>();
+    private final HashMap<String, AuthData> authDataMap = new HashMap<>();
+    private final HashMap<String, GameData> games = new HashMap<>();
+
+    /**
+     * Clears all entries in the database, resulting in a clean wipe.
+     */
+    @Override
+    public void clearAll() {
+        users.clear();
+        authDataMap.clear();
+        games.clear();
+    }
 
     /**
      * Insert data for a new user into the data store.

@@ -4,6 +4,11 @@ import model.UserData;
 
 public interface DataAccess {
     /**
+     * Clears all entries in the database, resulting in a clean wipe.
+     */
+    void clearAll();
+
+    /**
      * Insert data for a new user into the data store.
      *
      * @param userData The user data to insert.
