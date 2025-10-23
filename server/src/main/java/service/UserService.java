@@ -17,7 +17,7 @@ public class UserService {
 
     public AuthData register(UserData userData) throws EntryAlreadyExistsException {
         dataAccess.insertUser(userData);
-        return new AuthData(userData.username(), authService.generateToken());
+        return authService.createAuth(userData);
     }
 
     /**
