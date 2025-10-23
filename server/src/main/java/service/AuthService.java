@@ -74,4 +74,19 @@ public class AuthService {
     public void clearAll() {
         dataAccess.clearAuthData();
     }
+
+    /**
+     * Verify that the given auth token is valid.
+     *
+     * @param authToken The auth token to verify.
+     * @return true if the auth token exists in the database; false otherwise.
+     */
+    public boolean verifyAuth(String authToken) {
+        try {
+            dataAccess.getAuthData(authToken);
+        } catch (EntryNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
 }
