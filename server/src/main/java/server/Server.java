@@ -9,6 +9,7 @@ import model.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
 import service.AuthService;
+import service.GameService;
 import service.UserService;
 
 public class Server {
@@ -16,20 +17,35 @@ public class Server {
     private final Javalin server;
     private final UserService userService;
     private final AuthService authService;
+    private final GameService gameService;
     private final Gson serializer;
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
         DataAccess dataAccess = new MemoryDataAccess();
-        authService = new AuthService();
+        authService = new AuthService(dataAccess);
         userService = new UserService(authService, dataAccess);
+        gameService = new GameService(dataAccess);
         serializer = new Gson();
 
         // Register your endpoints and exception handlers here.
 
-        server.delete("db", ctx -> ctx.result("{}"));
+        server.delete("db", this::clear);
         server.post("user", this::register);
 
+    }
+
+    private void clear(Context ctx) {
+        try {
+            userService.clearAll();
+            authService.clearAll();
+            gameService.clearAll();
+        } catch (Exception e) {
+            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
+            return;
+        }
+
+        ctx.result("{}");
     }
 
     private void register(Context ctx) {
