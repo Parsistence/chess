@@ -10,9 +10,9 @@ import model.GameData;
 import model.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
-import org.jetbrains.annotations.NotNull;
 import service.AuthService;
 import service.GameService;
+import service.TeamAlreadyTakenException;
 import service.UserService;
 
 import java.util.Collection;
@@ -41,7 +41,42 @@ public class Server {
         server.delete("session", this::logout);
         server.get("game", this::listGames);
         server.post("game", this::createGame);
+        server.put("game", this::joinGame);
 
+    }
+
+    private void joinGame(Context ctx) {
+        String authToken = ctx.header("authorization");
+        if (!authService.verifyAuth(authToken)) {
+            ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            return;
+        }
+
+        JoinGameRequest req = serializer.fromJson(ctx.body(), JoinGameRequest.class);
+        if (req.playerColor() == null) {
+            ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+            return;
+        }
+
+        UserData userData;
+        try {
+            userData = userService.getUser(authToken);
+        } catch (EntryNotFoundException e) {
+            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
+            return;
+        }
+
+        try {
+            gameService.joinGame(userData, req.playerColor(), req.gameID());
+        } catch (TeamAlreadyTakenException e) {
+            ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
+            return;
+        } catch (Exception e) {
+            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
+            return;
+        }
+
+        ctx.result("{}");
     }
 
     private void createGame(Context ctx) {
