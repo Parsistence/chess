@@ -50,7 +50,7 @@ public class Server {
 
         AuthData authData;
         try {
-            authData = userService.login(req);
+            authData = authService.login(req);
         } catch (EntryNotFoundException e) {
             ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
             return;

@@ -2,10 +2,11 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.EntryAlreadyExistsException;
+import dataaccess.EntryNotFoundException;
 import model.AuthData;
 import model.UserData;
+import server.LoginRequest;
 
-import javax.xml.crypto.Data;
 import java.util.UUID;
 
 public class AuthService {
@@ -34,6 +35,22 @@ public class AuthService {
         dataAccess.insertAuthData(authData);
 
         return authData;
+    }
+
+    /**
+     * Attempt to log in an existing user and get an auth token for the user.
+     *
+     * @param req The LoginRequest object.
+     * @return An AuthData with the user's auth token.
+     */
+    public AuthData login(LoginRequest req) throws EntryNotFoundException, EntryAlreadyExistsException {
+        UserData user = dataAccess.getUser(req.username());
+
+        if (!req.password().equals(user.password())) {
+            throw new EntryNotFoundException("Password does not match");
+        }
+
+        return createAuth(user);
     }
 
     /**
