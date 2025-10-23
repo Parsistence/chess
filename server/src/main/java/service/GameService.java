@@ -8,4 +8,11 @@ public class GameService {
     public GameService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
+
+    /**
+     * Clear all game data from the server.
+     */
+    public void clearAll() {
+        dataAccess.clearGameData();
+    }
 }

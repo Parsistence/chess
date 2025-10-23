@@ -15,4 +15,11 @@ public class AuthService {
     public String generateToken() {
         return UUID.randomUUID().toString();
     }
+
+    /**
+     * Clear all auth data from the server.
+     */
+    public void clearAll() {
+        dataAccess.clearAuthData();
+    }
 }

@@ -18,4 +18,11 @@ public class UserService {
         dataAccess.insertUser(userData);
         return new AuthData(userData.username(), authService.generateToken());
     }
+
+    /**
+     * Clear all user data from the server.
+     */
+    public void clearAll() {
+        dataAccess.clearUsers();
+    }
 }
