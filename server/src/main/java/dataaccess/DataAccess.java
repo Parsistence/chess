@@ -68,4 +68,12 @@ public interface DataAccess {
      * @return A collection of all games in the database.
      */
     Collection<GameData> listGames();
+
+    /**
+     * Creates a new game and adds it to the database.
+     *
+     * @param gameName The name to give the new game.
+     * @return The game data added to the database.
+     */
+    GameData createGame(String gameName) throws EntryAlreadyExistsException;
 }

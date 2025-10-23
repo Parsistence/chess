@@ -11,7 +11,8 @@ import java.util.Objects;
 public class MemoryDataAccess implements DataAccess {
     private final HashMap<String, UserData> users = new HashMap<>();
     private final HashMap<String, AuthData> authDataMap = new HashMap<>();
-    private final HashMap<String, GameData> games = new HashMap<>();
+    private final HashMap<Integer, GameData> games = new HashMap<>();
+    private int gameIDCounter = -1;
 
     /**
      * Clears all user data in the database, resulting in a clean wipe.
@@ -128,6 +129,34 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public Collection<GameData> listGames() {
         return games.values();
+    }
+
+    /**
+     * Increment and return gameIDCounter to get a new gameID.
+     *
+     * @return the new game ID.
+     */
+    private int generateGameID() {
+        return ++gameIDCounter;
+    }
+
+    /**
+     * Creates a new game and adds it to the database.
+     *
+     * @param gameName The name to give the new game.
+     * @return The game data added to the database.
+     */
+    @Override
+    public GameData createGame(String gameName) throws EntryAlreadyExistsException {
+        int gameID = generateGameID();
+        var gameData = new GameData(gameID, gameName);
+
+        var result = games.put(gameID, gameData);
+        if (result != null) {
+            throw new EntryAlreadyExistsException("A game with ID " + gameID + " already exists.");
+        }
+
+        return gameData;
     }
 
     @Override
