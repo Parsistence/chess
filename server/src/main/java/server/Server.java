@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.EntryAlreadyExistsException;
+import dataaccess.EntryNotFoundException;
 import dataaccess.MemoryDataAccess;
 import model.AuthData;
 import model.UserData;
@@ -32,7 +33,33 @@ public class Server {
 
         server.delete("db", this::clear);
         server.post("user", this::register);
+        server.post("session", this::login);
 
+    }
+
+    private void login(Context ctx) {
+        LoginRequest req = serializer.fromJson(ctx.body(), LoginRequest.class);
+
+        if (
+                req.username() == null ||
+                        req.password() == null
+        ) {
+            ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+            return;
+        }
+
+        AuthData authData;
+        try {
+            authData = userService.login(req);
+        } catch (EntryNotFoundException e) {
+            ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            return;
+        } catch (Exception e) {
+            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
+            return;
+        }
+
+        ctx.result(serializer.toJson(authData));
     }
 
     private void clear(Context ctx) {
