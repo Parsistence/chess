@@ -4,9 +4,19 @@ import model.UserData;
 
 public interface DataAccess {
     /**
-     * Clears all entries in the database, resulting in a clean wipe.
+     * Clears all user data in the database.
      */
-    void clearAll();
+    void clearUsers();
+
+    /**
+     * Clears all auth data in the database.
+     */
+    void clearAuthData();
+
+    /**
+     * Clears all game data in the database.
+     */
+    void clearGameData();
 
     /**
      * Insert data for a new user into the data store.

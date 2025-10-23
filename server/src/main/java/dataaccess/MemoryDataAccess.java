@@ -13,12 +13,26 @@ public class MemoryDataAccess implements DataAccess {
     private final HashMap<String, GameData> games = new HashMap<>();
 
     /**
-     * Clears all entries in the database, resulting in a clean wipe.
+     * Clears all user data in the database, resulting in a clean wipe.
      */
     @Override
-    public void clearAll() {
+    public void clearUsers() {
         users.clear();
+    }
+
+    /**
+     * Clears all auth data in the database.
+     */
+    @Override
+    public void clearAuthData() {
         authDataMap.clear();
+    }
+
+    /**
+     * Clears all game data in the database.
+     */
+    @Override
+    public void clearGameData() {
         games.clear();
     }
 
