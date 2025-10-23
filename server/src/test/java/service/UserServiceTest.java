@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @Test
-    void registerNewUser() throws EntryNotFoundException {
+    void register() throws EntryNotFoundException {
         DataAccess dataAccess = new MemoryDataAccess();
         AuthService authService = new AuthService(dataAccess);
         UserService userService = new UserService(authService, dataAccess);
@@ -49,5 +49,42 @@ class UserServiceTest {
 
         assertDoesNotThrow(() -> userService.register(user));
         assertThrows(EntryAlreadyExistsException.class, () -> userService.register(user));
+    }
+
+    @Test
+    void clearAll() {
+        DataAccess dataAccess = new MemoryDataAccess();
+        AuthService authService = new AuthService(dataAccess);
+        UserService userService = new UserService(authService, dataAccess);
+
+        UserData user1 = new UserData(
+                "bob_java",
+                "kotlingoblin",
+                "bjava@jmail.com"
+        );
+        UserData user2 = new UserData(
+                "jane_java",
+                "jayjay",
+                "jjava@jmail.com"
+        );
+        UserData user3 = new UserData(
+                "walt_whitman",
+                "stars",
+                "whitman@hotflash.com"
+        );
+
+        assertDoesNotThrow(() -> {
+            userService.register(user1);
+            userService.register(user2);
+            userService.register(user3);
+        });
+
+        userService.clearAll();
+
+        assertDoesNotThrow(() -> {
+            userService.register(user1);
+            userService.register(user2);
+            userService.register(user3);
+        });
     }
 }
