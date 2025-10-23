@@ -1,7 +1,10 @@
 package dataaccess;
 
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+
+import java.util.Collection;
 
 public interface DataAccess {
     /**
@@ -58,4 +61,11 @@ public interface DataAccess {
      * @param authToken the auth token associated with the auth data.
      */
     void removeAuth(String authToken);
+
+    /**
+     * Gets all games in the database.
+     *
+     * @return A collection of all games in the database.
+     */
+    Collection<GameData> listGames();
 }

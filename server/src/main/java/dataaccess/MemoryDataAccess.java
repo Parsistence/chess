@@ -4,6 +4,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -117,6 +118,16 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public void removeAuth(String authToken) {
         authDataMap.remove(authToken);
+    }
+
+    /**
+     * Gets all games in the database.
+     *
+     * @return A collection of all games in the database.
+     */
+    @Override
+    public Collection<GameData> listGames() {
+        return games.values();
     }
 
     @Override
