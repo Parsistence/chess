@@ -4,6 +4,7 @@ import dataaccess.DataAccess;
 import dataaccess.EntryAlreadyExistsException;
 import dataaccess.EntryNotFoundException;
 import dataaccess.MemoryDataAccess;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
@@ -86,5 +87,34 @@ class UserServiceTest {
             userService.register(user2);
             userService.register(user3);
         });
+    }
+
+    @Test
+    void getUser() throws EntryAlreadyExistsException, EntryNotFoundException {
+        DataAccess dataAccess = new MemoryDataAccess();
+        AuthService authService = new AuthService(dataAccess);
+        UserService userService = new UserService(authService, dataAccess);
+
+        var user = new UserData(
+                "bob_java",
+                "kotlingoblin",
+                "bjava@jmail.com"
+        );
+
+        AuthData authData = userService.register(user);
+
+        UserData savedUser = userService.getUser(authData.authToken());
+
+        assertEquals(savedUser, user);
+    }
+
+    @Test
+    void noUserFound() {
+        DataAccess dataAccess = new MemoryDataAccess();
+        AuthService authService = new AuthService(dataAccess);
+        UserService userService = new UserService(authService, dataAccess);
+        
+        String randomAuthToken = authService.generateToken();
+        assertThrows(EntryNotFoundException.class, () -> userService.getUser(randomAuthToken));
     }
 }
