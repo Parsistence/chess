@@ -5,9 +5,6 @@ import dataaccess.EntryAlreadyExistsException;
 import dataaccess.EntryNotFoundException;
 import model.AuthData;
 import model.UserData;
-import server.LoginRequest;
-
-import java.util.Objects;
 
 public class UserService {
     private final AuthService authService;
@@ -28,5 +25,15 @@ public class UserService {
      */
     public void clearAll() {
         dataAccess.clearUsers();
+    }
+
+    /**
+     * Gets a user in the server given the user's auth token.
+     *
+     * @param authToken The auth token associated with the user.
+     * @return The user data.
+     */
+    public UserData getUser(String authToken) throws EntryNotFoundException {
+        return dataAccess.getUserFromAuth(authToken);
     }
 }
