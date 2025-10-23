@@ -12,15 +12,15 @@ public class MemoryDataAccess implements DataAccess {
      * Insert data for a new user into the data store.
      *
      * @param userData The user data to insert.
-     * @throws DataAccessException If there is already user data in the data store with the given username.
+     * @throws EntryAlreadyExistsException If there is already user data in the data store with the given username.
      */
     @Override
-    public void insertUser(UserData userData) throws DataAccessException {
+    public void insertUser(UserData userData) throws EntryAlreadyExistsException {
         String username = userData.username();
         var result = users.put(username, userData);
 
         if (result != null) {
-            throw new DataAccessException(
+            throw new EntryAlreadyExistsException(
                     "Tried to register a new user with username " + username + ", but there is already a user registered with that name"
             );
         }

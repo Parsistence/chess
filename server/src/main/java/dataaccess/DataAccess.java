@@ -7,9 +7,9 @@ public interface DataAccess {
      * Insert data for a new user into the data store.
      *
      * @param userData The user data to insert.
-     * @throws DataAccessException If the user data was unable to be inserted into the data store.
+     * @throws EntryAlreadyExistsException If the user data was unable to be inserted into the data store.
      */
-    void insertUser(UserData userData) throws DataAccessException;
+    void insertUser(UserData userData) throws EntryAlreadyExistsException;
 
     /**
      * Get data for an existing user from the data store.

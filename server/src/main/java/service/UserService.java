@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
+import dataaccess.EntryAlreadyExistsException;
 import model.AuthData;
 import model.UserData;
 
@@ -14,7 +14,7 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public AuthData register(UserData userData) throws DataAccessException {
+    public AuthData register(UserData userData) throws EntryAlreadyExistsException {
         dataAccess.insertUser(userData);
         return new AuthData(userData.username(), authService.generateToken());
     }

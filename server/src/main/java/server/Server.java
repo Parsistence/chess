@@ -1,8 +1,9 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
+import dataaccess.EntryAlreadyExistsException;
 import dataaccess.MemoryDataAccess;
 import model.AuthData;
 import model.UserData;
@@ -16,13 +17,14 @@ public class Server {
     private final Javalin server;
     private final UserService userService;
     private final AuthService authService;
-    private final DataAccess dataAccess;
+    private final Gson serializer;
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
-        dataAccess = new MemoryDataAccess();
+        DataAccess dataAccess = new MemoryDataAccess();
         authService = new AuthService();
         userService = new UserService(authService, dataAccess);
+        serializer = new Gson();
 
         // Register your endpoints and exception handlers here.
 
@@ -32,15 +34,23 @@ public class Server {
     }
 
     private void register(Context ctx) {
-        var serializer = new Gson();
-        UserData req = serializer.fromJson(ctx.body(), UserData.class);
+        UserData req = null;
+        try {
+            req = serializer.fromJson(ctx.body(), UserData.class);
+        } catch (JsonSyntaxException e) {
+            ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+        }
 
         // call to the service and register
         AuthData res = null;
         try {
             res = userService.register(req);
-        } catch (DataAccessException e) {
-            throw new RuntimeException("Exception handling not implemented: " + e); // TODO
+        } catch (EntryAlreadyExistsException e) {
+            ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
+            return;
+        } catch (Exception e) {
+            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
+            return;
         }
 
         ctx.result(serializer.toJson(res));
