@@ -74,6 +74,24 @@ public class MemoryDataAccess implements DataAccess {
         return userData;
     }
 
+    /**
+     * Insert new auth data into the database
+     *
+     * @param authData The auth data to insert
+     * @throws EntryAlreadyExistsException If auth data already exists in database
+     */
+    @Override
+    public void insertAuthData(AuthData authData) throws EntryAlreadyExistsException {
+        String authToken = authData.authToken();
+        var result = authDataMap.put(authToken, authData);
+
+        if (result != null) {
+            throw new EntryAlreadyExistsException(
+                    "Tried to save a new auth token for user " + authData.username() + ", but the auth token already exists in the database"
+            );
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

@@ -1,5 +1,6 @@
 package dataaccess;
 
+import model.AuthData;
 import model.UserData;
 
 public interface DataAccess {
@@ -34,4 +35,12 @@ public interface DataAccess {
      * @throws EntryNotFoundException If the user data was unable to be retrieved from the data store.
      */
     UserData getUser(String username) throws EntryNotFoundException;
+
+    /**
+     * Insert new auth data into the database
+     *
+     * @param authData The auth data to insert
+     * @throws EntryAlreadyExistsException If auth data already exists in database
+     */
+    void insertAuthData(AuthData authData) throws EntryAlreadyExistsException;
 }
