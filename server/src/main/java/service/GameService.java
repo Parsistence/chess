@@ -1,7 +1,9 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.EntryAlreadyExistsException;
 import model.GameData;
+import server.CreateGameResponse;
 
 import java.util.Collection;
 
@@ -26,5 +28,16 @@ public class GameService {
      */
     public Collection<GameData> listGames() {
         return dataAccess.listGames();
+    }
+
+    /**
+     * Create a new chess game.
+     *
+     * @param gameName The name to give the new game.
+     * @return A CreateGameResponse with the game ID.
+     */
+    public CreateGameResponse createGame(String gameName) throws EntryAlreadyExistsException {
+        GameData gameData = dataAccess.createGame(gameName);
+        return new CreateGameResponse(gameData.gameID());
     }
 }
