@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import dataaccess.DataAccess;
 import dataaccess.EntryAlreadyExistsException;
 import dataaccess.MemoryDataAccess;
@@ -34,15 +33,18 @@ public class Server {
     }
 
     private void register(Context ctx) {
-        UserData req = null;
-        try {
-            req = serializer.fromJson(ctx.body(), UserData.class);
-        } catch (JsonSyntaxException e) {
+        UserData req = serializer.fromJson(ctx.body(), UserData.class);
+        if (
+                req.username() == null ||
+                        req.password() == null ||
+                        req.email() == null
+        ) {
             ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
+            return;
         }
 
         // call to the service and register
-        AuthData res = null;
+        AuthData res;
         try {
             res = userService.register(req);
         } catch (EntryAlreadyExistsException e) {
