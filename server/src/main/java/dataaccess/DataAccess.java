@@ -43,4 +43,19 @@ public interface DataAccess {
      * @throws EntryAlreadyExistsException If auth data already exists in database
      */
     void insertAuthData(AuthData authData) throws EntryAlreadyExistsException;
+
+    /**
+     * Get auth data from the database.
+     *
+     * @param authToken The auth token corresponding to the auth data.
+     * @return The auth data.
+     */
+    AuthData getAuthData(String authToken) throws EntryNotFoundException;
+
+    /**
+     * Remove auth data from the database.
+     *
+     * @param authToken the auth token associated with the auth data.
+     */
+    void removeAuth(String authToken);
 }

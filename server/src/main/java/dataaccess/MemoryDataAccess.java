@@ -92,6 +92,33 @@ public class MemoryDataAccess implements DataAccess {
         }
     }
 
+    /**
+     * Get auth data from the database.
+     *
+     * @param authToken The auth token corresponding to the auth data.
+     * @return The auth data.
+     */
+    @Override
+    public AuthData getAuthData(String authToken) throws EntryNotFoundException {
+        AuthData authData = authDataMap.get(authToken);
+
+        if (authData == null) {
+            throw new EntryNotFoundException("Tried to get auth data for an auth token that does not exist");
+        }
+
+        return authData;
+    }
+
+    /**
+     * Remove auth data from the database.
+     *
+     * @param authToken the auth token associated with the auth data.
+     */
+    @Override
+    public void removeAuth(String authToken) {
+        authDataMap.remove(authToken);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

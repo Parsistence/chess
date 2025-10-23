@@ -54,6 +54,21 @@ public class AuthService {
     }
 
     /**
+     * Given an auth token, logs out the user associated with that auth token
+     *
+     * @param authToken The auth token associated with the user.
+     */
+    public void logout(String authToken) throws EntryNotFoundException {
+        try {
+            dataAccess.getAuthData(authToken);
+        } catch (EntryNotFoundException e) {
+            throw new EntryNotFoundException(e.toString());
+        }
+
+        dataAccess.removeAuth(authToken);
+    }
+
+    /**
      * Clear all auth data from the server.
      */
     public void clearAll() {
