@@ -76,4 +76,28 @@ public interface DataAccess {
      * @return The game data added to the database.
      */
     GameData createGame(String gameName) throws EntryAlreadyExistsException;
+
+    /**
+     * Gets a user in the database given the user's auth token.
+     *
+     * @param authToken The auth token associated with the user.
+     * @return The user data.
+     */
+    UserData getUserFromAuth(String authToken) throws EntryNotFoundException;
+
+    /**
+     * Gets a game from the database given a game ID.
+     *
+     * @param gameID The game ID associated with the game.
+     * @return The game.
+     */
+    GameData getGame(int gameID) throws EntryNotFoundException;
+
+    /**
+     * Updates game data in the database with the given data.
+     *
+     * @param gameID      The game ID.
+     * @param updatedGame The data to update into the database.
+     */
+    void updateGame(int gameID, GameData updatedGame) throws EntryNotFoundException;
 }

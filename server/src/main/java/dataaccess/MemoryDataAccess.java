@@ -159,6 +159,60 @@ public class MemoryDataAccess implements DataAccess {
         return gameData;
     }
 
+    /**
+     * Gets a user in the database given the user's auth token.
+     *
+     * @param authToken The auth token associated with the user.
+     * @return The user data.
+     */
+    @Override
+    public UserData getUserFromAuth(String authToken) throws EntryNotFoundException {
+        AuthData authData = authDataMap.get(authToken);
+        if (authData == null) {
+            throw new EntryNotFoundException("Auth token not found in database");
+        }
+
+        String username = authData.username();
+        UserData userData = getUser(username);
+        if (userData == null) {
+            throw new EntryNotFoundException("User " + username + " not found in database.");
+        }
+
+        return userData;
+    }
+
+    /**
+     * Gets a game from the database given a game ID.
+     *
+     * @param gameID The game ID associated with the game.
+     * @return The game.
+     */
+    @Override
+    public GameData getGame(int gameID) throws EntryNotFoundException {
+        GameData game = games.get(gameID);
+
+        if (game == null) {
+            throw new EntryNotFoundException("A game with id " + gameID + " does not exist.");
+        }
+
+        return game;
+    }
+
+    /**
+     * Updates game data in the database with the given data.
+     *
+     * @param gameID      The game ID.
+     * @param updatedGame The data to update into the database.
+     */
+    @Override
+    public void updateGame(int gameID, GameData updatedGame) throws EntryNotFoundException {
+        if (!games.containsKey(gameID)) {
+            throw new EntryNotFoundException("A game with id " + gameID + " does not exist.");
+        }
+
+        games.put(gameID, updatedGame);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
