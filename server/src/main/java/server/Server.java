@@ -34,7 +34,24 @@ public class Server {
         server.delete("db", this::clear);
         server.post("user", this::register);
         server.post("session", this::login);
+        server.delete("session", this::logout);
 
+    }
+
+    private void logout(Context ctx) {
+        String authToken = ctx.header("authorization");
+
+        try {
+            authService.logout(authToken);
+        } catch (EntryNotFoundException e) {
+            ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+            return;
+        } catch (Exception e) {
+            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
+            return;
+        }
+
+        ctx.result("{}");
     }
 
     private void login(Context ctx) {
