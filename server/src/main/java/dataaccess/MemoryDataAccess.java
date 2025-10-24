@@ -12,7 +12,7 @@ public class MemoryDataAccess implements DataAccess {
     private final HashMap<String, UserData> users = new HashMap<>();
     private final HashMap<String, AuthData> authDataMap = new HashMap<>();
     private final HashMap<Integer, GameData> games = new HashMap<>();
-    private int gameIDCounter = -1;
+    private int gameIDCounter = 0;
 
     /**
      * Clears all user data in the database, resulting in a clean wipe.
