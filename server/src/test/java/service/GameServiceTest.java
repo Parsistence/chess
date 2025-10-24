@@ -84,18 +84,18 @@ class GameServiceTest {
         int gameID = dataAccess.createGame("Booyah").gameID();
 
         UserData user1 = new UserData(
-                "bob_java",
-                "kotlingoblin",
-                "bjava@jmail.com"
+                "team_white_guy",
+                "whitegoesfirst",
+                "twg@jmail.com"
         );
         assertDoesNotThrow(() -> gameService.joinGame(user1, ChessGame.TeamColor.WHITE, gameID));
         GameData game = dataAccess.getGame(gameID);
         assertEquals(game.whiteUsername(), user1.username());
 
         UserData user2 = new UserData(
-                "jane_java",
-                "jayjay",
-                "jjava@jmail.com"
+                "team_black_guy",
+                "blackalwayswins",
+                "tbg@jmail.com"
         );
         assertDoesNotThrow(() -> gameService.joinGame(user2, ChessGame.TeamColor.BLACK, gameID));
         game = dataAccess.getGame(gameID);
@@ -111,18 +111,18 @@ class GameServiceTest {
         int gameID = dataAccess.createGame("Booyah").gameID();
 
         UserData user1 = new UserData(
-                "bob_java",
-                "kotlingoblin",
-                "bjava@jmail.com"
+                "i_like_white",
+                "whiterules",
+                "ilw@jmail.com"
         );
         assertDoesNotThrow(() -> gameService.joinGame(user1, ChessGame.TeamColor.WHITE, gameID));
         GameData game = dataAccess.getGame(gameID);
         assertEquals(game.whiteUsername(), user1.username());
 
         UserData user2 = new UserData(
-                "jane_java",
-                "jayjay",
-                "jjava@jmail.com"
+                "i_also_like_white",
+                "whiterocks",
+                "ialw@jmail.com"
         );
         assertThrows(TeamAlreadyTakenException.class, () -> gameService.joinGame(user2, ChessGame.TeamColor.WHITE, gameID));
     }
