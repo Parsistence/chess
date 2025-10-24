@@ -53,7 +53,7 @@ public class Server {
         }
 
         JoinGameRequest req = serializer.fromJson(ctx.body(), JoinGameRequest.class);
-        if (req.playerColor() == null) {
+        if (req.playerColor() == null || req.gameID() == 0) {
             ctx.status(400).result("{ \"message\": \"Error: bad request\" }");
             return;
         }
@@ -110,7 +110,7 @@ public class Server {
         }
 
         Collection<GameData> games = gameService.listGames();
-        ctx.result(serializer.toJson(games));
+        ctx.result(String.format("{ \"games\": %s }", serializer.toJson(games)));
     }
 
     private void logout(Context ctx) {
