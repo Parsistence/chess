@@ -135,19 +135,19 @@ class AuthServiceTest {
         UserService userService = new UserService(authService, dataAccess);
 
         UserData user1 = new UserData(
-                "bob_java",
-                "kotlingoblin",
-                "bjava@jmail.com"
+                "pawnpromoter",
+                "queensandknights",
+                "pawnp@jmail.com"
         );
         UserData user2 = new UserData(
-                "jane_java",
-                "jayjay",
-                "jjava@jmail.com"
+                "queenrules",
+                "kingsarecool",
+                "queen@jmail.com"
         );
         UserData user3 = new UserData(
-                "walt_whitman",
-                "stars",
-                "whitman@hotflash.com"
+                "ilovechess",
+                "yesido",
+                "chesslove@hotflash.com"
         );
 
         AuthData auth1 = userService.register(user1);
