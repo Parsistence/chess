@@ -4,10 +4,67 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import javax.xml.crypto.Data;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
 public class MySqlDataAccess implements DataAccess {
+    public MySqlDataAccess() throws DataAccessException {
+        configureDatabase();
+    }
+
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS user_data (
+                `username` VARCHAR(256) NOT NULL,
+                `password` VARCHAR(256) NOT NULL,
+                `email` VARCHAR(256) NOT NULL,
+                PRIMARY KEY (`username`),
+                INDEX (`email`)
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS auth_data (
+            `username` VARCHAR(256) NOT NULL,
+            `auth_token` VARCHAR(256) NOT NULL,
+            PRIMARY KEY (`auth_token`),
+            INDEX (`username`)
+            )
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS game_data (
+                `game_id` INT NOT NULL AUTO_INCREMENT,
+                `white_username` VARCHAR(256) DEFAULT NULL,
+                `black_username` VARCHAR(256) DEFAULT NULL,
+                `game_name` VARCHAR(256) NOT NULL,
+                `game` TEXT DEFAULT NULL,
+                PRIMARY KEY (`game_id`),
+                INDEX (`game_name`)
+            )
+            """
+    };
+
+    /**
+     * Configures the database with the necessary tables.
+     *
+     * @throws DataAccessException If there was an issue configuring the database.
+     */
+    private void configureDatabase() throws DataAccessException {
+        DatabaseManager.createDatabase();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String statement : createStatements) {
+                try (PreparedStatement preparedStatement = conn.prepareStatement(statement)) {
+                    preparedStatement.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+    }
+
     /**
      * Clears all user data in the database.
      */
