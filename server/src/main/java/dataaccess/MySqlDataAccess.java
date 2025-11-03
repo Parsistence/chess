@@ -97,8 +97,14 @@ public class MySqlDataAccess implements DataAccess {
      * Clears all game data in the database.
      */
     @Override
-    public void clearGameData() {
-
+    public void clearGameData() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("TRUNCATE TABLE game_data")) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     /**

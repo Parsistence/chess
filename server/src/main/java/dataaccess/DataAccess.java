@@ -20,7 +20,7 @@ public interface DataAccess {
     /**
      * Clears all game data in the database.
      */
-    void clearGameData();
+    void clearGameData() throws DataAccessException;
 
     /**
      * Insert data for a new user into the data store.
