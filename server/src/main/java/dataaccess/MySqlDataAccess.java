@@ -83,8 +83,14 @@ public class MySqlDataAccess implements DataAccess {
      * Clears all auth data in the database.
      */
     @Override
-    public void clearAuthData() {
-
+    public void clearAuthData() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("TRUNCATE TABLE auth_data")) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     /**

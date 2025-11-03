@@ -15,7 +15,7 @@ public interface DataAccess {
     /**
      * Clears all auth data in the database.
      */
-    void clearAuthData();
+    void clearAuthData() throws DataAccessException;
 
     /**
      * Clears all game data in the database.
