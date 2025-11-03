@@ -69,8 +69,14 @@ public class MySqlDataAccess implements DataAccess {
      * Clears all user data in the database.
      */
     @Override
-    public void clearUsers() {
-
+    public void clearUsers() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("TRUNCATE TABLE user_data")) {
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     /**

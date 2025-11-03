@@ -10,7 +10,7 @@ public interface DataAccess {
     /**
      * Clears all user data in the database.
      */
-    void clearUsers();
+    void clearUsers() throws DataAccessException;
 
     /**
      * Clears all auth data in the database.
