@@ -3,6 +3,7 @@ package dataaccess;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
 import java.sql.Connection;
@@ -107,15 +108,34 @@ public class MySqlDataAccess implements DataAccess {
         }
     }
 
+    private String encryptPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
     /**
      * Insert data for a new user into the data store.
+     * <br>
+     * <b>Note</b>: The user password is encrypted before it is inserted into the data store.
      *
      * @param userData The user data to insert.
      * @throws EntryAlreadyExistsException If the user data was unable to be inserted into the data store.
      */
     @Override
-    public void insertUser(UserData userData) throws EntryAlreadyExistsException {
-
+    public void insertUser(UserData userData) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("INSERT INTO user_data VALUES (?, ?, ?)")) {
+                statement.setString(1, userData.username());
+                String encryptedPassword = encryptPassword(userData.password());
+                statement.setString(2, encryptedPassword);
+                statement.setString(3, userData.email());
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) { // Duplicate Entry code for MySQL
+                throw new EntryAlreadyExistsException(e);
+            }
+            throw new DataAccessException(e);
+        }
     }
 
     /**
