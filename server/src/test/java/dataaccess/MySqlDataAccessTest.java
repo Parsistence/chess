@@ -216,7 +216,11 @@ class MySqlDataAccessTest {
     }
 
     @Test
-    void getGame() {
+    void getGame() throws DataAccessException {
+        GameData game = dataAccess.createGame(randomString(5));
+
+        GameData savedGame = dataAccess.getGame(game.gameID());
+        assertEquals(game, savedGame);
     }
 
     @Test
