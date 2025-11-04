@@ -83,6 +83,14 @@ class MySqlDataAccessTest {
     }
 
     @Test
+    void insertDuplicateUser() {
+        UserData user = randomUser();
+
+        assertDoesNotThrow(() -> dataAccess.insertUser(user));
+        assertThrows(EntryAlreadyExistsException.class, () -> dataAccess.insertUser(user));
+    }
+
+    @Test
     void getUser() {
     }
 
