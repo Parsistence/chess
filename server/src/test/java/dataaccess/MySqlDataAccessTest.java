@@ -188,6 +188,13 @@ class MySqlDataAccessTest {
     }
 
     @Test
+    void createDuplicateGame() {
+        String gameName = randomString(8);
+        assertDoesNotThrow(() -> dataAccess.createGame(gameName));
+        assertThrows(EntryAlreadyExistsException.class, () -> dataAccess.createGame(gameName));
+    }
+
+    @Test
     void getUserFromAuth() {
     }
 
