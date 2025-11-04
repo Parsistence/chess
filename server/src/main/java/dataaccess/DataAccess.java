@@ -53,7 +53,7 @@ public interface DataAccess {
      * @param authToken The auth token corresponding to the auth data.
      * @return The auth data.
      */
-    AuthData getAuthData(String authToken) throws EntryNotFoundException;
+    AuthData getAuthData(String authToken) throws DataAccessException;
 
     /**
      * Remove auth data from the database.
