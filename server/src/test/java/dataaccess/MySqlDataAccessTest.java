@@ -209,6 +209,13 @@ class MySqlDataAccessTest {
     }
 
     @Test
+    void getUserFromNonexistentAuth() {
+        String authToken = authService.generateToken();
+
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.getUserFromAuth(authToken));
+    }
+
+    @Test
     void getGame() {
     }
 
