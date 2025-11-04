@@ -83,7 +83,7 @@ public interface DataAccess {
      * @param authToken The auth token associated with the user.
      * @return The user data.
      */
-    UserData getUserFromAuth(String authToken) throws EntryNotFoundException;
+    UserData getUserFromAuth(String authToken) throws DataAccessException;
 
     /**
      * Gets a game from the database given a game ID.

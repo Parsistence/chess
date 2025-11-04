@@ -295,8 +295,21 @@ public class MySqlDataAccess implements DataAccess {
      * @return The user data.
      */
     @Override
-    public UserData getUserFromAuth(String authToken) throws EntryNotFoundException {
-        return null;
+    public UserData getUserFromAuth(String authToken) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("SELECT (username, auth_token) FROM user_data WHERE auth_token=?")) {
+                statement.setString(1, authToken);
+                ResultSet rs = statement.executeQuery();
+                if (rs.next()) {
+                    String username = rs.getString(1);
+                    return getUser(username);
+                } else {
+                    throw new EntryNotFoundException("No user with auth token " + authToken + " found in database.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     /**
