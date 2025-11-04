@@ -117,6 +117,23 @@ class MySqlDataAccessTest {
     }
 
     @Test
+    void verifyPassword() throws DataAccessException {
+        UserData user = randomUser();
+        dataAccess.insertUser(user);
+
+        assertTrue(dataAccess.verifyPassword(user.username(), user.password()));
+    }
+
+    @Test
+    void verifyIncorrectPassword() throws DataAccessException {
+        UserData user = randomUser();
+        dataAccess.insertUser(user);
+
+        String incorrectPassword = randomString(8);
+        assertFalse(dataAccess.verifyPassword(user.username(), incorrectPassword));
+    }
+
+    @Test
     void insertAuthData() throws DataAccessException {
         AuthData authData = randomAuthData();
 
