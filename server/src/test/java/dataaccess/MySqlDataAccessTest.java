@@ -230,7 +230,22 @@ class MySqlDataAccessTest {
     }
 
     @Test
-    void updateGame() {
+    void updateGame() throws DataAccessException {
+        GameData game = dataAccess.createGame(randomString(8));
+
+        String newWhiteUsername = randomString(5);
+        String newBlackUsername = randomString(5);
+        GameData updatedGame = new GameData(
+                game.gameID(),
+                newWhiteUsername,
+                newBlackUsername,
+                game.gameName(),
+                game.game()
+        );
+
+        assertDoesNotThrow(() -> dataAccess.updateGame(game.gameID(), updatedGame));
+        assertEquals(updatedGame, dataAccess.getGame(game.gameID()));
+        assertNotEquals(game, dataAccess.getGame(game.gameID()));
     }
 
     private UserData randomUser() {
