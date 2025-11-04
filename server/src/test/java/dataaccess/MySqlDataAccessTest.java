@@ -60,7 +60,7 @@ class MySqlDataAccessTest {
         GameData game1 = dataAccess.createGame(randomString(5));
         GameData game2 = dataAccess.createGame(randomString(5));
         GameData game3 = dataAccess.createGame(randomString(5));
-        
+
         dataAccess.clearGameData();
 
         assertThrows(EntryNotFoundException.class, () -> dataAccess.getGame(game1.gameID()));
@@ -69,7 +69,17 @@ class MySqlDataAccessTest {
     }
 
     @Test
-    void insertUser() {
+    void insertUser() throws DataAccessException {
+        UserData user = randomUser();
+
+        assertDoesNotThrow(() -> dataAccess.insertUser(user));
+
+        UserData savedUser = dataAccess.getUser(user.username());
+
+        assertEquals(user.username(), savedUser.username());
+        assertEquals(user.email(), savedUser.email());
+
+        assertTrue(dataAccess.verifyPassword(user.username(), user.password()));
     }
 
     @Test
