@@ -46,7 +46,7 @@ public class AuthService {
     public AuthData login(LoginRequest req) throws DataAccessException {
         UserData user = dataAccess.getUser(req.username());
 
-        if (!req.password().equals(user.password())) {
+        if (!dataAccess.verifyPassword(user.username(), user.password())) {
             throw new EntryNotFoundException("Password does not match");
         }
 
