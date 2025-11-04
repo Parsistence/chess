@@ -67,7 +67,7 @@ public interface DataAccess {
      *
      * @return A collection of all games in the database.
      */
-    Collection<GameData> listGames();
+    Collection<GameData> listGames() throws DataAccessException;
 
     /**
      * Creates a new game and adds it to the database.

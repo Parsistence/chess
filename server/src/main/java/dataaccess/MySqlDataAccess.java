@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -11,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 public class MySqlDataAccess implements DataAccess {
@@ -234,8 +237,25 @@ public class MySqlDataAccess implements DataAccess {
      * @return A collection of all games in the database.
      */
     @Override
-    public Collection<GameData> listGames() {
-        return List.of();
+    public Collection<GameData> listGames() throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("SELECT * FROM game_data")) {
+                ResultSet rs = statement.executeQuery();
+                Collection<GameData> gameList = new HashSet<>();
+                while (rs.next()) {
+                    int gameID = rs.getInt(1);
+                    String whiteUsername = rs.getString(2);
+                    String blackUsername = rs.getString(3);
+                    String gameName = rs.getString(4);
+                    String chessGameJson = rs.getString(5);
+                    ChessGame chessGame = new Gson().fromJson(chessGameJson, ChessGame.class);
+                    gameList.add(new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame));
+                }
+                return gameList;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     /**
