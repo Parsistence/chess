@@ -248,6 +248,15 @@ class MySqlDataAccessTest {
         assertNotEquals(game, dataAccess.getGame(game.gameID()));
     }
 
+    @Test
+    void updateNonexistentGame() {
+        int gameID = (int) (Math.random() * 1000);
+
+        GameData gameData = new GameData(gameID, randomString(8));
+
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.updateGame(gameID, gameData));
+    }
+
     private UserData randomUser() {
         String username = randomString(5);
         String password = randomString(8);
