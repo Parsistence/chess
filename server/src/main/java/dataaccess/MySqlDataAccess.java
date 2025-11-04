@@ -234,7 +234,10 @@ public class MySqlDataAccess implements DataAccess {
         try (Connection conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement("DELETE FROM auth_data WHERE auth_token=?")) {
                 statement.setString(1, authToken);
-                statement.executeUpdate();
+                int rowCount = statement.executeUpdate();
+                if (rowCount == 0) {
+                    throw new EntryNotFoundException("Could not remove auth token " + authToken + " because it was not found.");
+                }
             }
         } catch (SQLException e) {
             throw new DataAccessException(e);
