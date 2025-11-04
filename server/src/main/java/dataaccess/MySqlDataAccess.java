@@ -314,11 +314,11 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public UserData getUserFromAuth(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var statement = conn.prepareStatement("SELECT (username, auth_token) FROM user_data WHERE auth_token=?")) {
+            try (var statement = conn.prepareStatement("SELECT * FROM auth_data WHERE auth_token = ?")) {
                 statement.setString(1, authToken);
                 ResultSet rs = statement.executeQuery();
                 if (rs.next()) {
-                    String username = rs.getString(1);
+                    String username = rs.getString("username");
                     return getUser(username);
                 } else {
                     throw new EntryNotFoundException("No user with auth token " + authToken + " found in database.");
