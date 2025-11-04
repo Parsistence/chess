@@ -44,7 +44,7 @@ public class MySqlDataAccess implements DataAccess {
                 `game_id` INT NOT NULL AUTO_INCREMENT,
                 `white_username` VARCHAR(256) DEFAULT NULL,
                 `black_username` VARCHAR(256) DEFAULT NULL,
-                `game_name` VARCHAR(256) NOT NULL,
+                `game_name` VARCHAR(256) NOT NULL UNIQUE,
                 `game` TEXT DEFAULT NULL,
                 PRIMARY KEY (`game_id`),
                 INDEX (`game_name`)
@@ -265,8 +265,27 @@ public class MySqlDataAccess implements DataAccess {
      * @return The game data added to the database.
      */
     @Override
-    public GameData createGame(String gameName) throws EntryAlreadyExistsException {
-        return null;
+    public GameData createGame(String gameName) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("INSERT INTO game_data (game_name) VALUES (?)")) {
+                statement.setString(1, gameName);
+                statement.executeUpdate();
+
+                try (var gameIDStatement = conn.prepareStatement("SELECT game_id FROM game_data")) {
+                    ResultSet rs = gameIDStatement.executeQuery();
+                    if (!rs.next()) {
+                        throw new DataAccessException("unable to query game ID for game " + gameName);
+                    }
+                    int gameID = rs.getInt(1);
+                    return new GameData(gameID, gameName);
+                }
+            }
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) { // Duplicate Entry code for MySQL
+                throw new EntryAlreadyExistsException(e);
+            }
+            throw new DataAccessException(e);
+        }
     }
 
     /**

@@ -75,7 +75,7 @@ public interface DataAccess {
      * @param gameName The name to give the new game.
      * @return The game data added to the database.
      */
-    GameData createGame(String gameName) throws EntryAlreadyExistsException;
+    GameData createGame(String gameName) throws DataAccessException;
 
     /**
      * Gets a user in the database given the user's auth token.
