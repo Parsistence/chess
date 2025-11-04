@@ -217,8 +217,15 @@ public class MySqlDataAccess implements DataAccess {
      * @param authToken the auth token associated with the auth data.
      */
     @Override
-    public void removeAuth(String authToken) {
-
+    public void removeAuth(String authToken) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("DELETE FROM auth_data WHERE auth_token=?")) {
+                statement.setString(1, authToken);
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     /**

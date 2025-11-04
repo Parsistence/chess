@@ -60,7 +60,7 @@ public interface DataAccess {
      *
      * @param authToken the auth token associated with the auth data.
      */
-    void removeAuth(String authToken);
+    void removeAuth(String authToken) throws DataAccessException;
 
     /**
      * Gets all games in the database.
