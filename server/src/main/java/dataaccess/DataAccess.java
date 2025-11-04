@@ -99,5 +99,5 @@ public interface DataAccess {
      * @param gameID      The game ID.
      * @param updatedGame The data to update into the database.
      */
-    void updateGame(int gameID, GameData updatedGame) throws EntryNotFoundException;
+    void updateGame(int gameID, GameData updatedGame) throws DataAccessException;
 }

@@ -349,7 +349,19 @@ public class MySqlDataAccess implements DataAccess {
      * @param updatedGame The data to update into the database.
      */
     @Override
-    public void updateGame(int gameID, GameData updatedGame) throws EntryNotFoundException {
+    public void updateGame(int gameID, GameData updatedGame) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("UPDATE game_data SET game=? WHERE game_id=?")) {
+                String gameJson = new Gson().toJson(updatedGame);
+                statement.setString(1, gameJson);
+                statement.setInt(2, gameID);
 
+                if (statement.executeUpdate() == 0) {
+                    throw new EntryNotFoundException("No game found with ID " + gameID);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 }
