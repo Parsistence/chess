@@ -31,10 +31,10 @@ public class MySqlDataAccess implements DataAccess {
             """,
             """
             CREATE TABLE IF NOT EXISTS auth_data (
-            `username` VARCHAR(256) NOT NULL,
-            `auth_token` VARCHAR(256) NOT NULL,
-            PRIMARY KEY (`auth_token`),
-            INDEX (`username`)
+                `username` VARCHAR(256) NOT NULL,
+                `auth_token` VARCHAR(256) NOT NULL,
+                PRIMARY KEY (`auth_token`),
+                INDEX (`username`)
             )
             """,
             """
@@ -43,7 +43,7 @@ public class MySqlDataAccess implements DataAccess {
                 `white_username` VARCHAR(256) DEFAULT NULL,
                 `black_username` VARCHAR(256) DEFAULT NULL,
                 `game_name` VARCHAR(256) NOT NULL UNIQUE,
-                `game` TEXT DEFAULT NULL,
+                `game` TEXT NOT NULL,
                 PRIMARY KEY (`game_id`),
                 INDEX (`game_name`)
             )
@@ -280,11 +280,15 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public GameData createGame(String gameName) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var statement = conn.prepareStatement("INSERT INTO game_data (game_name) VALUES (?)")) {
+            try (var statement = conn.prepareStatement("INSERT INTO game_data (game_name, game) VALUES (?, ?)")) {
                 statement.setString(1, gameName);
+                var game = new ChessGame();
+                String gameJson = new Gson().toJson(game);
+                statement.setString(2, gameJson);
                 statement.executeUpdate();
 
-                try (var gameIDStatement = conn.prepareStatement("SELECT game_id FROM game_data")) {
+                try (var gameIDStatement = conn.prepareStatement("SELECT game_id FROM game_data WHERE game_name = ?")) {
+                    gameIDStatement.setString(1, gameName);
                     ResultSet rs = gameIDStatement.executeQuery();
                     if (!rs.next()) {
                         throw new DataAccessException("unable to query game ID for game " + gameName);
