@@ -319,7 +319,7 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var statement = conn.prepareStatement("SELECT * FROM game_data WHERE game_id=?")) {
+            try (var statement = conn.prepareStatement("SELECT * FROM game_data WHERE game_id = ?")) {
                 statement.setInt(1, gameID);
                 ResultSet rs = statement.executeQuery();
                 if (rs.next()) {

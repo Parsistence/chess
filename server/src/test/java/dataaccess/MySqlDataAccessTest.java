@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +56,16 @@ class MySqlDataAccessTest {
     }
 
     @Test
-    void clearGameData() {
+    void clearGameData() throws DataAccessException {
+        GameData game1 = dataAccess.createGame(randomString(5));
+        GameData game2 = dataAccess.createGame(randomString(5));
+        GameData game3 = dataAccess.createGame(randomString(5));
+        
+        dataAccess.clearGameData();
+
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.getGame(game1.gameID()));
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.getGame(game2.gameID()));
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.getGame(game3.gameID()));
     }
 
     @Test
