@@ -8,6 +8,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
@@ -146,8 +147,22 @@ public class MySqlDataAccess implements DataAccess {
      * @throws EntryNotFoundException If the user data was unable to be retrieved from the data store.
      */
     @Override
-    public UserData getUser(String username) throws EntryNotFoundException {
-        return null;
+    public UserData getUser(String username) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("SELECT (username, password, email) FROM user_data WHERE username=?")) {
+                statement.setString(1, username);
+                ResultSet rs = statement.executeQuery();
+                if (rs.next()) {
+                    String password = rs.getString(2);
+                    String email = rs.getString(3);
+                    return new UserData(username, password, email);
+                } else {
+                    throw new EntryNotFoundException("No user " + username + " found in database.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     /**

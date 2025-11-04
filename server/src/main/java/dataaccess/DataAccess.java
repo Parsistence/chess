@@ -37,7 +37,7 @@ public interface DataAccess {
      * @return A UserData object corresponding to the given username.
      * @throws EntryNotFoundException If the user data was unable to be retrieved from the data store.
      */
-    UserData getUser(String username) throws EntryNotFoundException;
+    UserData getUser(String username) throws DataAccessException;
 
     /**
      * Insert new auth data into the database
