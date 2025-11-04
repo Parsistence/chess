@@ -147,7 +147,13 @@ class MySqlDataAccessTest {
     }
 
     @Test
-    void removeAuth() {
+    void removeAuth() throws DataAccessException {
+        AuthData authData = randomAuthData();
+        dataAccess.insertAuthData(authData);
+        assertEquals(authData, dataAccess.getAuthData(authData.authToken()));
+
+        assertDoesNotThrow(() -> dataAccess.removeAuth(authData.authToken()));
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.getAuthData(authData.authToken()));
     }
 
     @Test
