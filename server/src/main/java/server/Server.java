@@ -25,7 +25,12 @@ public class Server {
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
-        DataAccess dataAccess = new MemoryDataAccess();
+        DataAccess dataAccess;
+        try {
+            dataAccess = new MySqlDataAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         authService = new AuthService(dataAccess);
         userService = new UserService(authService, dataAccess);
         gameService = new GameService(dataAccess);
@@ -44,7 +49,8 @@ public class Server {
         server.exception(EntryAlreadyExistsException.class, this::entryAlreadyExistsException);
         server.exception(EntryNotFoundException.class, this::entryNotFoundException);
         server.exception(TeamAlreadyTakenException.class, this::teamAlreadyTakenExceptionHandler);
-        server.exception(DataAccessException.class, this::dataAccessExceptionHandler);
+        server.exception(DataAccessException.class, this::genericExceptionHandler);
+        server.exception(Exception.class, this::genericExceptionHandler);
     }
 
     private void joinGame(Context ctx) throws DataAccessException, TeamAlreadyTakenException {
@@ -158,7 +164,7 @@ public class Server {
         ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
     }
 
-    private void dataAccessExceptionHandler(@NotNull DataAccessException e, @NotNull Context ctx) {
+    private void genericExceptionHandler(@NotNull Exception e, @NotNull Context ctx) {
         ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
     }
 
