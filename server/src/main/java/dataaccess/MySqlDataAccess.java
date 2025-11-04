@@ -7,14 +7,12 @@ import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 
 public class MySqlDataAccess implements DataAccess {
     public MySqlDataAccess() throws DataAccessException {
@@ -152,12 +150,12 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var statement = conn.prepareStatement("SELECT (username, password, email) FROM user_data WHERE username=?")) {
+            try (var statement = conn.prepareStatement("SELECT * FROM user_data WHERE username = ?")) {
                 statement.setString(1, username);
                 ResultSet rs = statement.executeQuery();
                 if (rs.next()) {
-                    String password = rs.getString(2);
-                    String email = rs.getString(3);
+                    String password = rs.getString("password");
+                    String email = rs.getString("email");
                     return new UserData(username, password, email);
                 } else {
                     throw new EntryNotFoundException("No user " + username + " found in database.");
@@ -199,11 +197,11 @@ public class MySqlDataAccess implements DataAccess {
     @Override
     public AuthData getAuthData(String authToken) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            try (var statement = conn.prepareStatement("SELECT (username, auth_token) FROM auth_data WHERE auth_token=?")) {
+            try (var statement = conn.prepareStatement("SELECT * FROM auth_data WHERE auth_token = ?")) {
                 statement.setString(1, authToken);
                 ResultSet rs = statement.executeQuery();
                 if (rs.next()) {
-                    String username = rs.getString(1);
+                    String username = rs.getString("username");
                     return new AuthData(username, authToken);
                 } else {
                     throw new EntryNotFoundException("No user with auth token " + authToken + " found in database.");
