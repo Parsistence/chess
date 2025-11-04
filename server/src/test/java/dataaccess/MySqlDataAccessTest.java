@@ -131,7 +131,12 @@ class MySqlDataAccessTest {
     }
 
     @Test
-    void getAuthData() {
+    void getAuthData() throws DataAccessException {
+        AuthData authData = randomAuthData();
+        dataAccess.insertAuthData(authData);
+
+        AuthData savedAuthData = dataAccess.getAuthData(authData.authToken());
+        assertEquals(authData, savedAuthData);
     }
 
     @Test
