@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
-import dataaccess.EntryAlreadyExistsException;
+import dataaccess.DataAccessException;
 import dataaccess.EntryNotFoundException;
 import model.AuthData;
 import model.UserData;
@@ -26,7 +26,7 @@ public class AuthService {
      * @param userData The user data to create the auth token for.
      * @return The auth data that was added to the server.
      */
-    public AuthData createAuth(UserData userData) throws EntryAlreadyExistsException {
+    public AuthData createAuth(UserData userData) throws DataAccessException {
         AuthData authData = new AuthData(
                 userData.username(),
                 generateToken()
@@ -43,7 +43,7 @@ public class AuthService {
      * @param req The LoginRequest object.
      * @return An AuthData with the user's auth token.
      */
-    public AuthData login(LoginRequest req) throws EntryNotFoundException, EntryAlreadyExistsException {
+    public AuthData login(LoginRequest req) throws DataAccessException {
         UserData user = dataAccess.getUser(req.username());
 
         if (!req.password().equals(user.password())) {
@@ -58,11 +58,13 @@ public class AuthService {
      *
      * @param authToken The auth token associated with the user.
      */
-    public void logout(String authToken) throws EntryNotFoundException {
+    public void logout(String authToken) throws DataAccessException {
         try {
             dataAccess.getAuthData(authToken);
         } catch (EntryNotFoundException e) {
             throw new EntryNotFoundException(e.toString());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
 
         dataAccess.removeAuth(authToken);
@@ -71,7 +73,7 @@ public class AuthService {
     /**
      * Clear all auth data from the server.
      */
-    public void clearAll() {
+    public void clearAll() throws DataAccessException {
         dataAccess.clearAuthData();
     }
 
@@ -81,7 +83,7 @@ public class AuthService {
      * @param authToken The auth token to verify.
      * @return true if the auth token exists in the database; false otherwise.
      */
-    public boolean verifyAuth(String authToken) {
+    public boolean verifyAuth(String authToken) throws DataAccessException {
         try {
             dataAccess.getAuthData(authToken);
         } catch (EntryNotFoundException e) {

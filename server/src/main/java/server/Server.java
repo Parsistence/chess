@@ -1,15 +1,13 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccess;
-import dataaccess.EntryAlreadyExistsException;
-import dataaccess.EntryNotFoundException;
-import dataaccess.MemoryDataAccess;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import io.javalin.*;
 import io.javalin.http.Context;
+import org.jetbrains.annotations.NotNull;
 import service.AuthService;
 import service.GameService;
 import service.TeamAlreadyTakenException;
@@ -43,9 +41,13 @@ public class Server {
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
 
+        server.exception(EntryAlreadyExistsException.class, this::entryAlreadyExistsException);
+        server.exception(EntryNotFoundException.class, this::entryNotFoundException);
+        server.exception(TeamAlreadyTakenException.class, this::teamAlreadyTakenExceptionHandler);
+        server.exception(DataAccessException.class, this::dataAccessExceptionHandler);
     }
 
-    private void joinGame(Context ctx) {
+    private void joinGame(Context ctx) throws DataAccessException, TeamAlreadyTakenException {
         String authToken = ctx.header("authorization");
         if (!authService.verifyAuth(authToken)) {
             ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
@@ -59,27 +61,13 @@ public class Server {
         }
 
         UserData userData;
-        try {
-            userData = userService.getUser(authToken);
-        } catch (EntryNotFoundException e) {
-            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
-            return;
-        }
-
-        try {
-            gameService.joinGame(userData, req.playerColor(), req.gameID());
-        } catch (TeamAlreadyTakenException e) {
-            ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
-            return;
-        } catch (Exception e) {
-            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
-            return;
-        }
+        userData = userService.getUser(authToken);
+        gameService.joinGame(userData, req.playerColor(), req.gameID());
 
         ctx.result("{}");
     }
 
-    private void createGame(Context ctx) {
+    private void createGame(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         if (!authService.verifyAuth(authToken)) {
             ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
@@ -93,16 +81,11 @@ public class Server {
         }
 
         CreateGameResponse res;
-        try {
-            res = gameService.createGame(req.gameName());
-        } catch (Exception e) {
-            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
-            return;
-        }
+        res = gameService.createGame(req.gameName());
         ctx.result(serializer.toJson(res));
     }
 
-    private void listGames(Context ctx) {
+    private void listGames(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         if (!authService.verifyAuth(authToken)) {
             ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
@@ -113,23 +96,15 @@ public class Server {
         ctx.result(String.format("{ \"games\": %s }", serializer.toJson(games)));
     }
 
-    private void logout(Context ctx) {
+    private void logout(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
 
-        try {
-            authService.logout(authToken);
-        } catch (EntryNotFoundException e) {
-            ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
-            return;
-        } catch (Exception e) {
-            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
-            return;
-        }
+        authService.logout(authToken);
 
         ctx.result("{}");
     }
 
-    private void login(Context ctx) {
+    private void login(Context ctx) throws DataAccessException {
         LoginRequest req = serializer.fromJson(ctx.body(), LoginRequest.class);
 
         if (
@@ -141,33 +116,19 @@ public class Server {
         }
 
         AuthData authData;
-        try {
-            authData = authService.login(req);
-        } catch (EntryNotFoundException e) {
-            ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
-            return;
-        } catch (Exception e) {
-            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
-            return;
-        }
-
+        authData = authService.login(req);
         ctx.result(serializer.toJson(authData));
     }
 
-    private void clear(Context ctx) {
-        try {
-            userService.clearAll();
-            authService.clearAll();
-            gameService.clearAll();
-        } catch (Exception e) {
-            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
-            return;
-        }
+    private void clear(Context ctx) throws DataAccessException {
+        userService.clearAll();
+        authService.clearAll();
+        gameService.clearAll();
 
         ctx.result("{}");
     }
 
-    private void register(Context ctx) {
+    private void register(Context ctx) throws DataAccessException {
         UserData req = serializer.fromJson(ctx.body(), UserData.class);
         if (
                 req.username() == null ||
@@ -180,17 +141,25 @@ public class Server {
 
         // call to the service and register
         AuthData res;
-        try {
-            res = userService.register(req);
-        } catch (EntryAlreadyExistsException e) {
-            ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
-            return;
-        } catch (Exception e) {
-            ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
-            return;
-        }
+        res = userService.register(req);
 
         ctx.result(serializer.toJson(res));
+    }
+
+    private void entryAlreadyExistsException(@NotNull EntryAlreadyExistsException e, @NotNull Context ctx) {
+        ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
+    }
+
+    private void entryNotFoundException(@NotNull EntryNotFoundException e, @NotNull Context ctx) {
+        ctx.status(401).result("{ \"message\": \"Error: unauthorized\" }");
+    }
+
+    private void teamAlreadyTakenExceptionHandler(@NotNull TeamAlreadyTakenException e, @NotNull Context ctx) {
+        ctx.status(403).result("{ \"message\": \"Error: already taken\" }");
+    }
+
+    private void dataAccessExceptionHandler(@NotNull DataAccessException e, @NotNull Context ctx) {
+        ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
     }
 
     public int run(int desiredPort) {

@@ -1,8 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
-import dataaccess.EntryAlreadyExistsException;
-import dataaccess.EntryNotFoundException;
+import dataaccess.DataAccessException;
 import model.AuthData;
 import model.UserData;
 
@@ -15,7 +14,7 @@ public class UserService {
         this.dataAccess = dataAccess;
     }
 
-    public AuthData register(UserData userData) throws EntryAlreadyExistsException {
+    public AuthData register(UserData userData) throws DataAccessException {
         dataAccess.insertUser(userData);
         return authService.createAuth(userData);
     }
@@ -23,7 +22,7 @@ public class UserService {
     /**
      * Clear all user data from the server.
      */
-    public void clearAll() {
+    public void clearAll() throws DataAccessException {
         dataAccess.clearUsers();
     }
 
@@ -33,7 +32,7 @@ public class UserService {
      * @param authToken The auth token associated with the user.
      * @return The user data.
      */
-    public UserData getUser(String authToken) throws EntryNotFoundException {
+    public UserData getUser(String authToken) throws DataAccessException {
         return dataAccess.getUserFromAuth(authToken);
     }
 }

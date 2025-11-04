@@ -1,9 +1,6 @@
 package service;
 
-import dataaccess.DataAccess;
-import dataaccess.EntryAlreadyExistsException;
-import dataaccess.EntryNotFoundException;
-import dataaccess.MemoryDataAccess;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
@@ -25,7 +22,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void createAuth() throws EntryAlreadyExistsException, EntryNotFoundException {
+    void createAuth() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         var authService = new AuthService(dataAccess);
 
@@ -46,7 +43,7 @@ class AuthServiceTest {
     // at the moment.
 
     @Test
-    void login() throws EntryAlreadyExistsException, EntryNotFoundException {
+    void login() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         var authService = new AuthService(dataAccess);
 
@@ -87,7 +84,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void logout() throws EntryAlreadyExistsException {
+    void logout() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         var authService = new AuthService(dataAccess);
         var userService = new UserService(authService, dataAccess);
@@ -108,7 +105,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void unauthorizedLogout() throws EntryAlreadyExistsException {
+    void unauthorizedLogout() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         var authService = new AuthService(dataAccess);
         var userService = new UserService(authService, dataAccess);
@@ -129,7 +126,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void clearAll() throws EntryAlreadyExistsException, EntryNotFoundException {
+    void clearAll() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         AuthService authService = new AuthService(dataAccess);
         UserService userService = new UserService(authService, dataAccess);
@@ -166,7 +163,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void verifyAuth() throws EntryAlreadyExistsException {
+    void verifyAuth() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         AuthService authService = new AuthService(dataAccess);
         UserService userService = new UserService(authService, dataAccess);
@@ -183,7 +180,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void verifyAuthExpired() throws EntryAlreadyExistsException {
+    void verifyAuthExpired() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         AuthService authService = new AuthService(dataAccess);
         UserService userService = new UserService(authService, dataAccess);
