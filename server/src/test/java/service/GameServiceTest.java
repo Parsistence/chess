@@ -1,10 +1,7 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.DataAccess;
-import dataaccess.EntryAlreadyExistsException;
-import dataaccess.EntryNotFoundException;
-import dataaccess.MemoryDataAccess;
+import dataaccess.*;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
@@ -18,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameServiceTest {
 
     @Test
-    void clearAll() throws EntryAlreadyExistsException {
+    void clearAll() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         GameService gameService = new GameService(dataAccess);
 
@@ -38,7 +35,7 @@ class GameServiceTest {
     }
 
     @Test
-    void listGames() throws EntryAlreadyExistsException {
+    void listGames() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         GameService gameService = new GameService(dataAccess);
 
@@ -58,7 +55,7 @@ class GameServiceTest {
     // No known negative cases for GameService#listGames (authentication occurs separately outside of method).
 
     @Test
-    void createGame() throws EntryAlreadyExistsException {
+    void createGame() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         GameService gameService = new GameService(dataAccess);
 
@@ -77,7 +74,7 @@ class GameServiceTest {
     // (authentication and request validation occurs separately outside of method).
 
     @Test
-    void joinGame() throws EntryAlreadyExistsException, EntryNotFoundException {
+    void joinGame() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         GameService gameService = new GameService(dataAccess);
 
@@ -104,7 +101,7 @@ class GameServiceTest {
     }
 
     @Test
-    void joinTeamAlreadyTaken() throws EntryAlreadyExistsException, EntryNotFoundException {
+    void joinTeamAlreadyTaken() throws DataAccessException {
         DataAccess dataAccess = new MemoryDataAccess();
         GameService gameService = new GameService(dataAccess);
 
