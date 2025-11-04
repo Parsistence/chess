@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.AuthService;
 
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MySqlDataAccessTest {
@@ -17,6 +19,10 @@ class MySqlDataAccessTest {
     void beforeEach() throws DataAccessException {
         dataAccess = new MySqlDataAccess();
         authService = new AuthService(dataAccess);
+
+        dataAccess.clearUsers();
+        dataAccess.clearAuthData();
+        dataAccess.clearGameData();
     }
 
     @Test
@@ -163,7 +169,16 @@ class MySqlDataAccessTest {
     }
 
     @Test
-    void listGames() {
+    void listGames() throws DataAccessException {
+        GameData game1 = dataAccess.createGame("game1");
+        GameData game2 = dataAccess.createGame("game2");
+        GameData game3 = dataAccess.createGame("game3");
+
+        Collection<GameData> savedGames = dataAccess.listGames();
+
+        assertTrue(savedGames.contains(game1));
+        assertTrue(savedGames.contains(game2));
+        assertTrue(savedGames.contains(game3));
     }
 
     @Test
