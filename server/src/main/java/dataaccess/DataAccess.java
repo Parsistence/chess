@@ -91,7 +91,7 @@ public interface DataAccess {
      * @param gameID The game ID associated with the game.
      * @return The game.
      */
-    GameData getGame(int gameID) throws EntryNotFoundException;
+    GameData getGame(int gameID) throws DataAccessException;
 
     /**
      * Updates game data in the database with the given data.

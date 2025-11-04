@@ -243,11 +243,11 @@ public class MySqlDataAccess implements DataAccess {
                 ResultSet rs = statement.executeQuery();
                 Collection<GameData> gameList = new HashSet<>();
                 while (rs.next()) {
-                    int gameID = rs.getInt(1);
-                    String whiteUsername = rs.getString(2);
-                    String blackUsername = rs.getString(3);
-                    String gameName = rs.getString(4);
-                    String chessGameJson = rs.getString(5);
+                    int gameID = rs.getInt("game_id");
+                    String whiteUsername = rs.getString("white_username");
+                    String blackUsername = rs.getString("black_username");
+                    String gameName = rs.getString("game_name");
+                    String chessGameJson = rs.getString("game");
                     ChessGame chessGame = new Gson().fromJson(chessGameJson, ChessGame.class);
                     gameList.add(new GameData(gameID, whiteUsername, blackUsername, gameName, chessGame));
                 }
@@ -319,8 +319,27 @@ public class MySqlDataAccess implements DataAccess {
      * @return The game.
      */
     @Override
-    public GameData getGame(int gameID) throws EntryNotFoundException {
-        return null;
+    public GameData getGame(int gameID) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("SELECT * FROM game_data WHERE game_id=?")) {
+                statement.setInt(1, gameID);
+                ResultSet rs = statement.executeQuery();
+                if (rs.next()) {
+                    String chessGameJson = rs.getString("game");
+                    ChessGame chessGame = new Gson().fromJson(chessGameJson, ChessGame.class);
+                    return new GameData(
+                            rs.getInt("game_id"),
+                            rs.getString("white_username"),
+                            rs.getString("black_username"),
+                            rs.getString("game_name"),
+                            chessGame
+                    );
+                }
+                throw new EntryNotFoundException("No game found with ID " + gameID);
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     /**
