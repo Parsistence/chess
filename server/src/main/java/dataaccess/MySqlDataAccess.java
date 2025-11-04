@@ -174,7 +174,8 @@ public class MySqlDataAccess implements DataAccess {
      * @return True if the password matches; false otherwise.
      */
     public boolean verifyPassword(String username, String password) throws DataAccessException {
-        return getUser(username).password().equals(encryptPassword(password));
+        String hashedPassword = getUser(username).password();
+        return BCrypt.checkpw(password, hashedPassword);
     }
 
     /**
