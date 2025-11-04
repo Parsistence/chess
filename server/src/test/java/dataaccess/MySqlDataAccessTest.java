@@ -224,6 +224,12 @@ class MySqlDataAccessTest {
     }
 
     @Test
+    void getNonexistentGame() {
+        int gameID = (int) (Math.random() * 1000);
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.getGame(gameID));
+    }
+
+    @Test
     void updateGame() {
     }
 
