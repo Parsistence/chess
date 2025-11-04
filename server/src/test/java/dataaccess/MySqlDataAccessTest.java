@@ -140,6 +140,13 @@ class MySqlDataAccessTest {
     }
 
     @Test
+    void getNonexistentAuthData() {
+        AuthData authData = randomAuthData();
+
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.getAuthData(authData.authToken()));
+    }
+
+    @Test
     void removeAuth() {
     }
 
