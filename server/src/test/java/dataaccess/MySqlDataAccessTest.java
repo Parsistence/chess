@@ -104,6 +104,13 @@ class MySqlDataAccessTest {
     }
 
     @Test
+    void getNonexistentUser() {
+        UserData user = randomUser();
+
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.getUser(user.username()));
+    }
+
+    @Test
     void insertAuthData() {
     }
 
