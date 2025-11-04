@@ -77,6 +77,18 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     /**
+     * Verifies a user's password matches the given password.
+     *
+     * @param username The username.
+     * @param password The password belonging to the user, unencrypted.
+     * @return True if the password matches; false otherwise.
+     */
+    @Override
+    public boolean verifyPassword(String username, String password) throws DataAccessException {
+        return getUser(username).password().equals(password);
+    }
+
+    /**
      * Insert new auth data into the database
      *
      * @param authData The auth data to insert

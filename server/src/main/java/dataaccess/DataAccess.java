@@ -40,6 +40,15 @@ public interface DataAccess {
     UserData getUser(String username) throws DataAccessException;
 
     /**
+     * Verifies a user's password matches the given password.
+     *
+     * @param username The username.
+     * @param password The password belonging to the user, unencrypted.
+     * @return True if the password matches; false otherwise.
+     */
+    boolean verifyPassword(String username, String password) throws DataAccessException;
+
+    /**
      * Insert new auth data into the database
      *
      * @param authData The auth data to insert
