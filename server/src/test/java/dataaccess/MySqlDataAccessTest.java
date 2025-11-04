@@ -122,6 +122,15 @@ class MySqlDataAccessTest {
     }
 
     @Test
+    void insertDuplicateAuthData() {
+        AuthData authData = randomAuthData();
+
+        assertDoesNotThrow(() -> dataAccess.insertAuthData(authData));
+        assertThrows(EntryAlreadyExistsException.class, () -> dataAccess.insertAuthData(authData));
+
+    }
+
+    @Test
     void getAuthData() {
     }
 
