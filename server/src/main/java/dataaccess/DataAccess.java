@@ -45,7 +45,7 @@ public interface DataAccess {
      * @param authData The auth data to insert
      * @throws EntryAlreadyExistsException If auth data already exists in database
      */
-    void insertAuthData(AuthData authData) throws EntryAlreadyExistsException;
+    void insertAuthData(AuthData authData) throws DataAccessException;
 
     /**
      * Get auth data from the database.

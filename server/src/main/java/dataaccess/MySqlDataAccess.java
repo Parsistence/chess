@@ -172,8 +172,19 @@ public class MySqlDataAccess implements DataAccess {
      * @throws EntryAlreadyExistsException If auth data already exists in database
      */
     @Override
-    public void insertAuthData(AuthData authData) throws EntryAlreadyExistsException {
-
+    public void insertAuthData(AuthData authData) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (var statement = conn.prepareStatement("INSERT INTO auth_data (username, auth_token) VALUES (?, ?)")) {
+                statement.setString(1, authData.username());
+                statement.setString(2, authData.authToken());
+                statement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 1062) { // Duplicate Entry code for MySQL
+                throw new EntryAlreadyExistsException(e);
+            }
+            throw new DataAccessException(e);
+        }
     }
 
     /**
