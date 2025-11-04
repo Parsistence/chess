@@ -85,7 +85,8 @@ public class MemoryDataAccess implements DataAccess {
      */
     @Override
     public boolean verifyPassword(String username, String password) throws DataAccessException {
-        return getUser(username).password().equals(password);
+        String savedPassword = getUser(username).password();
+        return savedPassword.equals(password);
     }
 
     /**
