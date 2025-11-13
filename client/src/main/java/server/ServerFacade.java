@@ -33,7 +33,7 @@ public class ServerFacade {
     public String register(String username, String password, String email) throws ResponseException {
         var userData = new UserData(username, password, email);
 
-        HttpRequest request = buildHttpRequest("/user", userData);
+        HttpRequest request = buildHttpRequest("POST", "/user", userData);
         HttpResponse<String> response = sendHttpRequest(request);
 
         AuthData authData = new Gson().fromJson(response.body(), AuthData.class);
@@ -55,7 +55,7 @@ public class ServerFacade {
     public String login(String username, String password) throws ResponseException {
         var loginRequest = new LoginRequest(username, password);
 
-        HttpRequest request = buildHttpRequest("/session", loginRequest);
+        HttpRequest request = buildHttpRequest("POST", "/session", loginRequest);
         HttpResponse<String> response = sendHttpRequest(request);
 
         AuthData authData = new Gson().fromJson(response.body(), AuthData.class);
@@ -82,15 +82,15 @@ public class ServerFacade {
         // TODO
     }
 
-    private HttpRequest buildHttpRequest(String path, Object body) {
-        return buildHttpRequest(path, body, null);
+    private HttpRequest buildHttpRequest(String method, String path, Object body) {
+        return buildHttpRequest(method, path, body, null);
     }
 
-    private HttpRequest buildHttpRequest(String path, Object body, HttpHeader header) {
+    private HttpRequest buildHttpRequest(String method, String path, Object body, HttpHeader header) {
         BodyPublisher requestBody = BodyPublishers.ofString(gson.toJson(body));
         var builder = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
-                .method("POST", requestBody);
+                .method(method, requestBody);
         if (header != null) {
             builder.header(header.name(), header.value());
         }
