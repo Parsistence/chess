@@ -2,6 +2,7 @@ package client;
 
 import model.UserData;
 import org.junit.jupiter.api.*;
+import server.ResponseException;
 import server.Server;
 import server.ServerFacade;
 
@@ -27,11 +28,10 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void register() {
+    void register() throws ResponseException {
         UserData user = randomUser();
-        assertDoesNotThrow(() -> {
-            facade.register(user.username(), user.password(), user.email());
-        });
+        String authToken = facade.register(user.username(), user.password(), user.email());
+        assertFalse(authToken.isBlank());
     }
 
     @Test
