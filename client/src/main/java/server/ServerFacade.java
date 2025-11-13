@@ -32,8 +32,8 @@ public class ServerFacade {
      */
     public String register(String username, String password, String email) throws ResponseException {
         var userData = new UserData(username, password, email);
-        HttpRequest request = buildHttpRequest("/user", userData);
 
+        HttpRequest request = buildHttpRequest("/user", userData);
         HttpResponse<String> response = sendHttpRequest(request);
 
         AuthData authData = new Gson().fromJson(response.body(), AuthData.class);
@@ -54,8 +54,8 @@ public class ServerFacade {
      */
     public String login(String username, String password) throws ResponseException {
         var loginRequest = new LoginRequest(username, password);
-        HttpRequest request = buildHttpRequest("/session", loginRequest);
 
+        HttpRequest request = buildHttpRequest("/session", loginRequest);
         HttpResponse<String> response = sendHttpRequest(request);
 
         AuthData authData = new Gson().fromJson(response.body(), AuthData.class);
@@ -66,7 +66,7 @@ public class ServerFacade {
         return authData.authToken();
     }
 
-    public void logout() {
+    public void logout(String authToken) {
         // TODO
     }
 
@@ -83,11 +83,18 @@ public class ServerFacade {
     }
 
     private HttpRequest buildHttpRequest(String path, Object body) {
+        return buildHttpRequest(path, body, null);
+    }
+
+    private HttpRequest buildHttpRequest(String path, Object body, HttpHeader header) {
         BodyPublisher requestBody = BodyPublishers.ofString(gson.toJson(body));
-        return HttpRequest.newBuilder()
+        var builder = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
-                .method("POST", requestBody)
-                .build();
+                .method("POST", requestBody);
+        if (header != null) {
+            builder.header(header.name(), header.value());
+        }
+        return builder.build();
     }
 
     private HttpResponse<String> sendHttpRequest(HttpRequest request) throws ResponseException {
