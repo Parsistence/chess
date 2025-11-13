@@ -23,13 +23,7 @@ public class ServerFacadeTests {
     static void stopServer() {
         server.stop();
     }
-
-
-    @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
-    }
-
+    
     @Test
     void register() {
 
