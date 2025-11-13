@@ -37,9 +37,9 @@ public class ServerFacadeTests {
     @Test
     void registerDuplicateUser() {
         UserData user = randomUser();
-        assertDoesNotThrow(() -> {
-            facade.register(user.username(), user.password(), user.email());
-        });
+        assertDoesNotThrow(() ->
+                facade.register(user.username(), user.password(), user.email())
+        );
         assertThrows(ResponseException.class, () ->
                 facade.register(user.username(), user.password(), user.email())
         );
