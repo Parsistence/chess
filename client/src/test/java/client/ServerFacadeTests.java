@@ -1,5 +1,7 @@
 package client;
 
+import dataaccess.DataAccessException;
+import dataaccess.MySqlDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.ResponseException;
@@ -12,14 +14,21 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServerFacadeTests {
     private static Server server;
     private static ServerFacade facade;
+    private static MySqlDataAccess dataAccess;
 
     @BeforeAll
-    public static void init() {
+    public static void init() throws DataAccessException {
         server = new Server();
         var port = server.run(0);
         String serverUrl = "http://localhost:" + port;
+
         facade = new ServerFacade(serverUrl);
         System.out.println("Started test HTTP server on " + port);
+
+        dataAccess = new MySqlDataAccess();
+        dataAccess.clearUsers();
+        dataAccess.clearAuthData();
+        dataAccess.clearGameData();
     }
 
     @AfterAll
