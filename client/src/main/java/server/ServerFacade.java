@@ -34,16 +34,7 @@ public class ServerFacade {
         var userData = new UserData(username, password, email);
         HttpRequest request = buildHttpRequest("/user", userData);
 
-        HttpResponse<String> response;
-        try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new ResponseException(e);
-        }
-
-        if (response.statusCode() / 100 != 2) {
-            throw ResponseException.fromJson(response.body());
-        }
+        HttpResponse<String> response = sendHttpRequest(request);
 
         AuthData authData = new Gson().fromJson(response.body(), AuthData.class);
         if (authData.authToken().isBlank()) {
@@ -65,16 +56,7 @@ public class ServerFacade {
         var loginRequest = new LoginRequest(username, password);
         HttpRequest request = buildHttpRequest("/session", loginRequest);
 
-        HttpResponse<String> response;
-        try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new ResponseException(e);
-        }
-
-        if (response.statusCode() / 100 != 2) {
-            throw ResponseException.fromJson(response.body());
-        }
+        HttpResponse<String> response = sendHttpRequest(request);
 
         AuthData authData = new Gson().fromJson(response.body(), AuthData.class);
         if (authData.authToken().isBlank()) {
@@ -106,5 +88,20 @@ public class ServerFacade {
                 .uri(URI.create(serverUrl + path))
                 .method("POST", requestBody)
                 .build();
+    }
+
+    private HttpResponse<String> sendHttpRequest(HttpRequest request) throws ResponseException {
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new ResponseException(e);
+        }
+
+        if (response.statusCode() / 100 != 2) {
+            throw ResponseException.fromJson(response.body());
+        }
+
+        return response;
     }
 }
