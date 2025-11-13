@@ -14,6 +14,7 @@ import java.net.http.HttpResponse;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
+    private final Gson gson = new Gson();
     private final String serverUrl;
 
     public ServerFacade(String serverUrl) {
@@ -26,12 +27,12 @@ public class ServerFacade {
      * @param username The username to be associated with the user.
      * @param password The password to be associated with the user.
      * @param email    The email to be associated with the user.
-     * @return The resultant auth token
+     * @return The resultant auth token.
      * @throws ResponseException If there is an issue communicating with the server.
      */
     public String register(String username, String password, String email) throws ResponseException {
         var userData = new UserData(username, password, email);
-        BodyPublisher requestBody = BodyPublishers.ofString(new Gson().toJson(userData));
+        BodyPublisher requestBody = BodyPublishers.ofString(gson.toJson(userData));
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + "/user"))
                 .method("POST", requestBody)
@@ -56,8 +57,39 @@ public class ServerFacade {
         return authData.authToken();
     }
 
-    public void login() {
-        // TODO
+    /**
+     * Log in an existing user and get the resultant auth token.
+     *
+     * @param username The username associated with the user.
+     * @param password The password associated with the user.
+     * @return The resultant auth token.
+     * @throws ResponseException If there is an issue communicating with the server.
+     */
+    public String login(String username, String password) throws ResponseException {
+        var loginRequest = new LoginRequest(username, password);
+        BodyPublisher requestBody = BodyPublishers.ofString(gson.toJson(loginRequest));
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + "/session"))
+                .method("POST", requestBody)
+                .build();
+
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new ResponseException(e);
+        }
+
+        if (response.statusCode() / 100 != 2) {
+            throw ResponseException.fromJson(response.body());
+        }
+
+        AuthData authData = new Gson().fromJson(response.body(), AuthData.class);
+        if (authData.authToken().isBlank()) {
+            throw new ResponseException("Server did not return an auth token in its response.");
+        }
+
+        return authData.authToken();
     }
 
     public void logout() {
