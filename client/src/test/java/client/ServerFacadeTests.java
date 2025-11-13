@@ -57,7 +57,12 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void login() {
+    void login() throws ResponseException {
+        UserData user = randomUser();
+        facade.register(user.username(), user.password(), user.email());
+
+        String authToken = facade.login(user.username(), user.password());
+        assertDoesNotThrow(() -> dataAccess.getUserFromAuth(authToken));
     }
 
     @Test
