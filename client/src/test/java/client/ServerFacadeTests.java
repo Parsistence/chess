@@ -41,6 +41,8 @@ public class ServerFacadeTests {
         UserData user = randomUser();
         String authToken = facade.register(user.username(), user.password(), user.email());
         assertFalse(authToken.isBlank());
+
+        assertDoesNotThrow(() -> dataAccess.getUserFromAuth(authToken));
     }
 
     @Test
