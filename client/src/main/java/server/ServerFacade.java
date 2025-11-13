@@ -49,6 +49,10 @@ public class ServerFacade {
         }
 
         AuthData authData = new Gson().fromJson(response.body(), AuthData.class);
+        if (authData.authToken().isBlank()) {
+            throw new ResponseException("Server did not return an auth token in its response.");
+        }
+
         return authData.authToken();
     }
 
