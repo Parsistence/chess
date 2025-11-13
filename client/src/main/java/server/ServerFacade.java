@@ -66,8 +66,10 @@ public class ServerFacade {
         return authData.authToken();
     }
 
-    public void logout(String authToken) {
-        // TODO
+    public void logout(String authToken) throws ResponseException {
+        HttpHeader authHeader = new HttpHeader("authorization", authToken);
+        HttpRequest request = buildHttpRequest("DELETE", "/session", null, authHeader);
+        sendHttpRequest(request); // No response body
     }
 
     public void listGames() {
