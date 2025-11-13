@@ -32,11 +32,7 @@ public class ServerFacade {
      */
     public String register(String username, String password, String email) throws ResponseException {
         var userData = new UserData(username, password, email);
-        BodyPublisher requestBody = BodyPublishers.ofString(gson.toJson(userData));
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(serverUrl + "/user"))
-                .method("POST", requestBody)
-                .build();
+        HttpRequest request = buildHttpRequest("/user", userData);
 
         HttpResponse<String> response;
         try {
@@ -67,11 +63,7 @@ public class ServerFacade {
      */
     public String login(String username, String password) throws ResponseException {
         var loginRequest = new LoginRequest(username, password);
-        BodyPublisher requestBody = BodyPublishers.ofString(gson.toJson(loginRequest));
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(serverUrl + "/session"))
-                .method("POST", requestBody)
-                .build();
+        HttpRequest request = buildHttpRequest("/session", loginRequest);
 
         HttpResponse<String> response;
         try {
@@ -108,4 +100,11 @@ public class ServerFacade {
         // TODO
     }
 
+    private HttpRequest buildHttpRequest(String path, Object body) {
+        BodyPublisher requestBody = BodyPublishers.ofString(gson.toJson(body));
+        return HttpRequest.newBuilder()
+                .uri(URI.create(serverUrl + path))
+                .method("POST", requestBody)
+                .build();
+    }
 }
