@@ -66,6 +66,15 @@ public class ServerFacadeTests {
     }
 
     @Test
+    void loginWrongPassword() throws ResponseException {
+        UserData user = randomUser();
+        facade.register(user.username(), user.password(), user.email());
+        
+        String wrongPassword = "wrong_" + user.password();
+        assertThrows(ResponseException.class, () -> facade.login(user.username(), wrongPassword));
+    }
+
+    @Test
     void logout() {
     }
 
