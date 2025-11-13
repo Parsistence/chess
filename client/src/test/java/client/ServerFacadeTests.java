@@ -5,6 +5,8 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class ServerFacadeTests {
     private static Server server;
@@ -23,10 +25,13 @@ public class ServerFacadeTests {
     static void stopServer() {
         server.stop();
     }
-    
+
     @Test
     void register() {
-
+        UserData user = randomUser();
+        assertDoesNotThrow(() -> {
+            facade.register(user.username(), user.password(), user.email());
+        });
     }
 
     @Test
