@@ -1,5 +1,6 @@
 package client;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.EntryNotFoundException;
 import dataaccess.MySqlDataAccess;
@@ -157,7 +158,23 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void joinGame() {
+    void joinGame() throws ResponseException, DataAccessException {
+        UserData user1 = randomUser();
+        String authToken1 = facade.register(user1.username(), user1.password(), user1.email());
+        UserData user2 = randomUser();
+        String authToken2 = facade.register(user2.username(), user2.password(), user2.email());
+
+        int gameID = facade.createGame(authToken1, randomString(8));
+
+        // White player joins
+        assertDoesNotThrow(() -> facade.joinGame(authToken1, ChessGame.TeamColor.WHITE, gameID));
+        GameData gameWhiteJoined = dataAccess.getGame(gameID);
+        assertEquals(user1.username(), gameWhiteJoined.whiteUsername());
+
+        // Black player joins
+        assertDoesNotThrow(() -> facade.joinGame(authToken2, ChessGame.TeamColor.BLACK, gameID));
+        GameData gameBlackJoined = dataAccess.getGame(gameID);
+        assertEquals(user2.username(), gameBlackJoined.blackUsername());
     }
 
     private UserData randomUser() {
