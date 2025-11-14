@@ -10,6 +10,7 @@ import static ui.EscapeSequences.*;
 public class ChessClient {
     private final ServerFacade server;
     private ClientState state;
+    private String username;
     private String authToken;
 
     public enum ClientState {
@@ -108,6 +109,7 @@ public class ChessClient {
 
         authToken = server.login(username, password);
 
+        this.username = username;
         state = ClientState.PostLogin;
 
         return "login successful! Welcome, " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR + "!";
@@ -126,6 +128,7 @@ public class ChessClient {
 
         authToken = server.register(username, password, email);
 
+        this.username = username;
         state = ClientState.PostLogin;
 
         return "Registration successful! You are now logged in as " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR;
@@ -157,6 +160,9 @@ public class ChessClient {
     }
 
     private String promptInput(Scanner scanner) {
+        if (state != ClientState.PreLogin) {
+            System.out.print(username + " ");
+        }
         System.out.print(">>> ");
         return scanner.nextLine();
     }
