@@ -88,9 +88,10 @@ public class ServerFacade {
         return games;
     }
 
-    public int createGame(String authToken) throws ResponseException {
+    public int createGame(String authToken, String gameName) throws ResponseException {
         HttpHeader authHeader = new HttpHeader("authorization", authToken);
-        HttpRequest request = buildHttpRequest("POST", "/game", null, authHeader);
+        var requestBody = new CreateGameRequest(gameName);
+        HttpRequest request = buildHttpRequest("POST", "/game", requestBody, authHeader);
         HttpResponse<String> response = sendHttpRequest(request);
 
         CreateGameResponse createGameResponse = gson.fromJson(response.body(), CreateGameResponse.class);
