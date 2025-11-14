@@ -176,4 +176,8 @@ public class Server {
     public void stop() {
         server.stop();
     }
+
+    public static void main(String[] args) {
+        new Server().run(8080);
+    }
 }
