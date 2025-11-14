@@ -88,8 +88,18 @@ public class ServerFacade {
         return games;
     }
 
-    public void createGame() {
-        // TODO
+    public int createGame(String authToken) throws ResponseException {
+        HttpHeader authHeader = new HttpHeader("authorization", authToken);
+        HttpRequest request = buildHttpRequest("POST", "/game", null, authHeader);
+        HttpResponse<String> response = sendHttpRequest(request);
+
+        CreateGameResponse createGameResponse = gson.fromJson(response.body(), CreateGameResponse.class);
+        int gameID = createGameResponse.gameID();
+        if (gameID == 0) {
+            throw new ResponseException("Server did not return a game ID in its response.");
+        }
+
+        return gameID;
     }
 
     public void joinGame() {
