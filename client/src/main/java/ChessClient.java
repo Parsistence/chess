@@ -96,6 +96,11 @@ public class ChessClient {
                             "play",
                             "<ID> [WHITE|BLACK]",
                             "Join an existing game and play as the given color. Run `list` first to update the list of games."
+                    ),
+                    buildUsageMessage(
+                            "observe",
+                            "<ID>",
+                            "Join an existing game as an observer. Run `list` first to update the list of games."
                     )
             )); // TODO
             case Gameplay -> String.join("\n", List.of(
@@ -249,12 +254,35 @@ public class ChessClient {
 
         server.joinGame(authToken, playerColor, realGameID);
 
-        return "Successfully joined game " + game.gameName() + " as " + playerColor;
+        return "Successfully joined game " + game.gameName() + " as " + playerColor + ".";
     }
 
     private String observeGame(String[] args) throws ResponseException {
-        // TODO
-        throw new ResponseException("Not implemented yet!");
+        assertLoggedIn();
+        if (args.length < 1) {
+            throw new ResponseException("Usage: " + buildUsageMessage(
+                    "observe", "<ID>"
+            ));
+        }
+        int gameListID;
+        try {
+            gameListID = Integer.parseInt(args[0]) - 1; // 1 indexed
+        } catch (NumberFormatException e) {
+            throw new ResponseException("Error: ID must be an integer.");
+        }
+
+        int realGameID;
+        GameData game;
+        try {
+            game = gameList.get(gameListID);
+            realGameID = game.gameID();
+        } catch (Throwable e) {
+            throw new ResponseException("Error: No game found with ID " + gameListID + ".");
+        }
+
+        // TODO: Join as an observer
+
+        return "Successfully joined game " + game.gameName() + " as an observer.";
     }
 
     private String promptInput(Scanner scanner) {
