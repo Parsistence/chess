@@ -1,3 +1,5 @@
+import chess.ChessGame;
+import chess.ChessGame.TeamColor;
 import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
@@ -89,6 +91,11 @@ public class ChessClient {
                     ),
                     buildUsageMessage(
                             "list", null, "Retrieve and list all chess games on the server."
+                    ),
+                    buildUsageMessage(
+                            "play",
+                            "<ID> [WHITE|BLACK]",
+                            "Join an existing game and play as the given color. Run `list` first to update the list of games."
                     )
             )); // TODO
             case Gameplay -> String.join("\n", List.of(
@@ -212,8 +219,37 @@ public class ChessClient {
     }
 
     private String playGame(String[] args) throws ResponseException {
-        // TODO
-        throw new ResponseException("Not implemented yet!");
+        assertLoggedIn();
+        if (args.length < 2) {
+            throw new ResponseException("Usage: " + buildUsageMessage(
+                    "play", "<ID> [WHITE|BLACK]"
+            ));
+        }
+        int gameListID;
+        try {
+            gameListID = Integer.parseInt(args[0]) - 1; // 1 indexed
+        } catch (NumberFormatException e) {
+            throw new ResponseException("Error: ID must be an integer.");
+        }
+
+        TeamColor playerColor = switch (args[1].toLowerCase()) {
+            case "white" -> TeamColor.WHITE;
+            case "black" -> TeamColor.BLACK;
+            default -> throw new ResponseException("Error: Second argument must be WHITE or BLACK.");
+        };
+
+        int realGameID;
+        GameData game;
+        try {
+            game = gameList.get(gameListID);
+            realGameID = game.gameID();
+        } catch (Throwable e) {
+            throw new ResponseException("Error: No game found with ID " + gameListID + ".");
+        }
+
+        server.joinGame(authToken, playerColor, realGameID);
+
+        return "Successfully joined game " + game.gameName() + " as " + playerColor;
     }
 
     private String observeGame(String[] args) throws ResponseException {
