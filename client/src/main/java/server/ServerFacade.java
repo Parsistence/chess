@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
@@ -103,8 +104,11 @@ public class ServerFacade {
         return gameID;
     }
 
-    public void joinGame() {
-        // TODO
+    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws ResponseException {
+        HttpHeader authHeader = new HttpHeader("authorization", authToken);
+        var requestBody = new JoinGameRequest(playerColor, gameID);
+        HttpRequest request = buildHttpRequest("PUT", "/game", requestBody, authHeader);
+        sendHttpRequest(request); // No response body
     }
 
     private HttpRequest buildHttpRequest(String method, String path, Object body) {
