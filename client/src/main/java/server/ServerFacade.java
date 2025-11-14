@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
+import java.util.Collection;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -72,8 +74,18 @@ public class ServerFacade {
         sendHttpRequest(request); // No response body
     }
 
-    public void listGames() {
-        // TODO
+    public Collection<GameData> listGames(String authToken) throws ResponseException {
+        HttpHeader authHeader = new HttpHeader("authorization", authToken);
+        HttpRequest request = buildHttpRequest("GET", "/game", null, authHeader);
+        HttpResponse<String> response = sendHttpRequest(request);
+
+        GameDataList gameDataList = gson.fromJson(response.body(), GameDataList.class);
+        Collection<GameData> games = gameDataList.games();
+        if (games == null) {
+            throw new ResponseException("Server did not return a list of games in its response.");
+        }
+
+        return games;
     }
 
     public void createGame() {
