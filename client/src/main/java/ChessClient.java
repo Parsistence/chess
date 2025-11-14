@@ -69,7 +69,10 @@ public class ChessClient {
             case PreLogin -> String.join("\n", List.of(
                     SET_TEXT_COLOR_BLUE + "====Pre-Login Commands====" + RESET_TEXT_COLOR,
                     buildUsageMessage(
-                            "login", " <username> <password>", "Log in with an existing account."
+                            "login", "<username> <password>", "Log in with an existing account."
+                    ),
+                    buildUsageMessage(
+                            "register", "<username> <password> <email>", "Register a new account and log in."
                     )
             )); // TODO
             case PostLogin -> String.join("\n", List.of(
@@ -89,22 +92,36 @@ public class ChessClient {
     private String login(String[] args) throws ResponseException {
         if (args.length < 2) {
             throw new ResponseException("Usage: " + buildUsageMessage(
-                    "login", " <username> <password>", "Log in with an existing account."
+                    "login", "<username> <password>", "Log in with an existing account."
             ));
         }
 
         String username = args[0];
         String password = args[1];
+
         authToken = server.login(username, password);
 
         state = ClientState.PostLogin;
 
-        return "login successful!";
+        return "login successful! Welcome, " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR + "!";
     }
 
     private String register(String[] args) throws ResponseException {
-        // TODO
-        throw new ResponseException("Not implemented yet!");
+        if (args.length < 3) {
+            throw new ResponseException("Usage: " + buildUsageMessage(
+                    "register", "<username> <password> <email>", "Register a new account and log in."
+            ));
+        }
+
+        String username = args[0];
+        String password = args[1];
+        String email = args[2];
+
+        authToken = server.register(username, password, email);
+
+        state = ClientState.PostLogin;
+
+        return "Registration successful! You are now logged in as " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR;
     }
 
     private String logout() throws ResponseException {
