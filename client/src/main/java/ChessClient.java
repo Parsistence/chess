@@ -77,7 +77,10 @@ public class ChessClient {
                     )
             )); // TODO
             case PostLogin -> String.join("\n", List.of(
-                    SET_TEXT_COLOR_BLUE + "====Post-Login Commands====" + RESET_TEXT_COLOR
+                    SET_TEXT_COLOR_BLUE + "====Post-Login Commands====" + RESET_TEXT_COLOR,
+                    buildUsageMessage(
+                            "logout", null, "Log out of the current account."
+                    )
             )); // TODO
             case Gameplay -> String.join("\n", List.of(
                     SET_TEXT_COLOR_BLUE + "====Gameplay Commands====" + RESET_TEXT_COLOR
@@ -108,11 +111,11 @@ public class ChessClient {
         String password = args[1];
 
         authToken = server.login(username, password);
-
         this.username = username;
         state = ClientState.PostLogin;
 
-        return "login successful! Welcome, " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR + "!";
+        return "login successful! Welcome, " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR + "!" +
+                " Type `help` for a list of post-login commands.";
     }
 
     private String register(String[] args) throws ResponseException {
@@ -127,16 +130,22 @@ public class ChessClient {
         String email = args[2];
 
         authToken = server.register(username, password, email);
-
         this.username = username;
         state = ClientState.PostLogin;
 
-        return "Registration successful! You are now logged in as " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR;
+        return "Registration successful! You are now logged in as " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR + "." +
+                " Type `help` for a list of post-login commands.";
     }
 
     private String logout() throws ResponseException {
-        // TODO
-        throw new ResponseException("Not implemented yet!");
+        assertLoggedIn();
+
+        server.logout(authToken);
+        username = "";
+        authToken = "";
+        state = ClientState.PreLogin;
+
+        return "Logout successful!";
     }
 
     private String createGame(String[] args) throws ResponseException {
