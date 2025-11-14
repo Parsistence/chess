@@ -25,7 +25,18 @@ public class ChessBoardStringRenderer {
      * @return The string representation of the chess board.
      */
     public String renderBoard(ChessBoard board, TeamColor teamColor) {
-        return WHITE_BISHOP + "Board renders here!" + BLACK_KING;
+        return switch (teamColor) {
+            case WHITE -> renderBoardWhite(board);
+            case BLACK -> renderBoardBlack(board);
+        };
+    }
+
+    private String renderBoardWhite(ChessBoard board) {
+        return null;
+    }
+
+    private String renderBoardBlack(ChessBoard board) {
+        return null;
     }
 
     public static void main(String[] args) {
