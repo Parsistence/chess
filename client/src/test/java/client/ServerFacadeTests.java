@@ -3,11 +3,15 @@ package client;
 import dataaccess.DataAccessException;
 import dataaccess.EntryNotFoundException;
 import dataaccess.MySqlDataAccess;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
+import server.GameDataList;
 import server.ResponseException;
 import server.Server;
 import server.ServerFacade;
+
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -96,7 +100,23 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void listGames() {
+    void listGames() throws DataAccessException, ResponseException {
+        // Add some games to database
+        GameData game1 = dataAccess.createGame("1_" + randomString(8));
+        GameData game2 = dataAccess.createGame("2_" + randomString(8));
+        GameData game3 = dataAccess.createGame("3_" + randomString(8));
+
+        // Register a user
+        UserData user = randomUser();
+        String authToken = facade.register(user.username(), user.password(), user.email());
+
+        // Get list of games
+        Collection<GameData> games = facade.listGames(authToken);
+
+        // Assert each game is in list
+        assertTrue(games.contains(game1));
+        assertTrue(games.contains(game2));
+        assertTrue(games.contains(game3));
     }
 
     @Test
