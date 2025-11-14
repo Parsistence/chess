@@ -1,4 +1,9 @@
 public class ChessClient {
-    public static void run() {
+    public ChessClient(String serverUrl) {
+        // TODO
+    }
+
+    public void run() {
+        // TODO
     }
 }

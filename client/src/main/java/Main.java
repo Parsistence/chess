@@ -8,7 +8,7 @@ public class Main {
         }
 
         try {
-            ChessClient.run();
+            new ChessClient(serverUrl).run();
         } catch (Throwable ex) {
             System.out.printf("Error starting up client: %s%n", ex.getMessage());
         }
