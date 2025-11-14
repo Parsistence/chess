@@ -1,7 +1,10 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessGame.TeamColor;
+
+import static ui.EscapeSequences.*;
 
 public class ChessBoardStringRenderer {
     /**
@@ -22,6 +25,18 @@ public class ChessBoardStringRenderer {
      * @return The string representation of the chess board.
      */
     public String renderBoard(ChessBoard board, TeamColor teamColor) {
-        return "Board renders here!";
+        return WHITE_BISHOP + "Board renders here!" + BLACK_KING;
+    }
+
+    public static void main(String[] args) {
+        var boardStringRenderer = new ChessBoardStringRenderer();
+        var game = new ChessGame();
+
+        System.out.println("White perspective:");
+        System.out.println(boardStringRenderer.renderBoard(game.getBoard(), TeamColor.WHITE));
+
+        System.out.println();
+        System.out.println("Black perspective:");
+        System.out.println(boardStringRenderer.renderBoard(game.getBoard(), TeamColor.BLACK));
     }
 }
