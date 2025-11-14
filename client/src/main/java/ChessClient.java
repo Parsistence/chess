@@ -164,7 +164,12 @@ public class ChessClient {
             System.out.print(username + " ");
         }
         System.out.print(">>> ");
-        return scanner.nextLine();
+
+        System.out.print(SET_TEXT_COLOR_GREEN + SET_TEXT_ITALIC);
+        String input = scanner.nextLine();
+        System.out.print(RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
+
+        return input;
     }
 
     private String buildUsageMessage(String cmd, String args) {
