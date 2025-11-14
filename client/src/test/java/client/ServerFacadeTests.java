@@ -177,6 +177,22 @@ public class ServerFacadeTests {
         assertEquals(user2.username(), gameBlackJoined.blackUsername());
     }
 
+    @Test
+    void joinGameColorTaken() throws ResponseException, DataAccessException {
+        UserData user1 = randomUser();
+        String authToken1 = facade.register(user1.username(), user1.password(), user1.email());
+        UserData user2 = randomUser();
+        String authToken2 = facade.register(user2.username(), user2.password(), user2.email());
+
+        int gameID = facade.createGame(authToken1, randomString(8));
+
+        // user1 joins as White
+        assertDoesNotThrow(() -> facade.joinGame(authToken1, ChessGame.TeamColor.WHITE, gameID));
+
+        // user2 tries to join also as White
+        assertThrows(ResponseException.class, () -> facade.joinGame(authToken2, ChessGame.TeamColor.WHITE, gameID));
+    }
+
     private UserData randomUser() {
         String username = randomString(5);
         String password = randomString(8);
