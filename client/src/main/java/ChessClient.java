@@ -65,7 +65,7 @@ public class ChessClient {
     }
 
     private String help() {
-        return switch (state) {
+        String stateCommands = switch (state) {
             case PreLogin -> String.join("\n", List.of(
                     SET_TEXT_COLOR_BLUE + "====Pre-Login Commands====" + RESET_TEXT_COLOR,
                     buildUsageMessage(
@@ -82,6 +82,13 @@ public class ChessClient {
                     SET_TEXT_COLOR_BLUE + "====Gameplay Commands====" + RESET_TEXT_COLOR
             )); // TODO
         };
+
+        String statelessCommands = String.join("\n", List.of(
+                buildUsageMessage("quit", null, "Quit the Chess client."),
+                buildUsageMessage("help", null, "Display this message.")
+        ));
+
+        return String.join("\n", List.of(stateCommands, statelessCommands));
     }
 
     private String quit() {
@@ -92,7 +99,7 @@ public class ChessClient {
     private String login(String[] args) throws ResponseException {
         if (args.length < 2) {
             throw new ResponseException("Usage: " + buildUsageMessage(
-                    "login", "<username> <password>", "Log in with an existing account."
+                    "login", "<username> <password>"
             ));
         }
 
@@ -109,7 +116,7 @@ public class ChessClient {
     private String register(String[] args) throws ResponseException {
         if (args.length < 3) {
             throw new ResponseException("Usage: " + buildUsageMessage(
-                    "register", "<username> <password> <email>", "Register a new account and log in."
+                    "register", "<username> <password> <email>"
             ));
         }
 
@@ -154,10 +161,25 @@ public class ChessClient {
         return scanner.nextLine();
     }
 
+    private String buildUsageMessage(String cmd, String args) {
+        return buildUsageMessage(cmd, args, null);
+    }
+
     private String buildUsageMessage(String cmd, String args, String desc) {
-        return SET_TEXT_COLOR_YELLOW + cmd +
-                SET_TEXT_COLOR_BLUE + " " + args +
-                SET_TEXT_COLOR_MAGENTA + " - " + desc +
-                RESET_TEXT_COLOR;
+        var stringBuilder = new StringBuilder();
+
+        stringBuilder.append(SET_TEXT_COLOR_YELLOW).append(cmd);
+
+        if (args != null) {
+            stringBuilder.append(SET_TEXT_COLOR_BLUE).append(" ").append(args);
+        }
+
+        if (desc != null) {
+            stringBuilder.append(SET_TEXT_COLOR_MAGENTA).append(" - ").append(desc);
+        }
+
+        stringBuilder.append(RESET_TEXT_COLOR);
+
+        return stringBuilder.toString();
     }
 }
