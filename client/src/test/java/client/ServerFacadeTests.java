@@ -177,7 +177,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void joinGameColorTaken() throws ResponseException, DataAccessException {
+    void joinGameColorTaken() throws ResponseException {
         UserData user1 = randomUser();
         String authToken1 = facade.register(user1.username(), user1.password(), user1.email());
         UserData user2 = randomUser();
