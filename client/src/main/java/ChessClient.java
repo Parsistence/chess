@@ -2,6 +2,7 @@ import server.ResponseException;
 import server.ServerFacade;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -65,12 +66,12 @@ public class ChessClient {
 
     private String help() {
         return switch (state) {
-            case PreLogin -> SET_TEXT_COLOR_BLUE + "====Pre-Login Commands====" + RESET_TEXT_COLOR +
-                    // login
-                    SET_TEXT_COLOR_YELLOW + "\nlogin" + SET_TEXT_COLOR_BLUE + " <username> <password>" +
-                    SET_TEXT_COLOR_MAGENTA + " - Log in with an existing account." +
-                    RESET_TEXT_COLOR
-            ; // TODO
+            case PreLogin -> String.join("\n", List.of(
+                    SET_TEXT_COLOR_BLUE + "====Pre-Login Commands====" + RESET_TEXT_COLOR,
+                    buildUsageMessage(
+                            "login", " <username> <password>", "Log in with an existing account."
+                    )
+            )); // TODO
             case PostLogin -> """
                     Post-Login commands go here!"""; // TODO
             case Gameplay -> """
@@ -85,9 +86,9 @@ public class ChessClient {
 
     private String login(String[] args) throws ResponseException {
         if (args.length < 2) {
-            throw new ResponseException(
-                    "Usage: " + SET_TEXT_COLOR_BLUE + "login" + RESET_TEXT_COLOR + " <username> <password>"
-            );
+            throw new ResponseException("Usage: " + buildUsageMessage(
+                    "login", " <username> <password>", "Log in with an existing account."
+            ));
         }
 
         String username = args[0];
@@ -132,5 +133,12 @@ public class ChessClient {
     private String promptInput(Scanner scanner) {
         System.out.print(">>> ");
         return scanner.nextLine();
+    }
+
+    private String buildUsageMessage(String cmd, String args, String desc) {
+        return SET_TEXT_COLOR_YELLOW + cmd +
+                SET_TEXT_COLOR_BLUE + " " + args +
+                SET_TEXT_COLOR_MAGENTA + " - " + desc +
+                RESET_TEXT_COLOR;
     }
 }
