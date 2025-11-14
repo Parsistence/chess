@@ -1,11 +1,12 @@
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessGame.TeamColor;
 import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
+import ui.ChessBoardStringRenderer;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,6 +14,7 @@ import static ui.EscapeSequences.*;
 
 public class ChessClient {
     private final ServerFacade server;
+    private final ChessBoardStringRenderer boardStringRenderer = new ChessBoardStringRenderer();
     private ClientState state;
     private String username;
     private String authToken;
@@ -254,7 +256,11 @@ public class ChessClient {
 
         server.joinGame(authToken, playerColor, realGameID);
 
-        return "Successfully joined game " + game.gameName() + " as " + playerColor + ".";
+        return String.join("\n", List.of(
+                "Successfully joined game " + game.gameName() + " as " + playerColor + " .",
+                "Chessboard:",
+                boardStringRenderer.renderBoard(new ChessGame().getBoard())
+        ));
     }
 
     private String observeGame(String[] args) throws ResponseException {
@@ -282,7 +288,11 @@ public class ChessClient {
 
         // TODO: Join as an observer
 
-        return "Successfully joined game " + game.gameName() + " as an observer.";
+        return String.join("\n", List.of(
+                "Successfully joined game " + game.gameName() + " as an observer.",
+                "Chessboard:",
+                boardStringRenderer.renderBoard(new ChessGame().getBoard())
+        ));
     }
 
     private String promptInput(Scanner scanner) {
