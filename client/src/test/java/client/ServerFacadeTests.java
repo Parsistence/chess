@@ -146,6 +146,17 @@ public class ServerFacadeTests {
     }
 
     @Test
+    void createGameUnauthorized() throws ResponseException {
+        UserData user = randomUser();
+        String authToken = facade.register(user.username(), user.password(), user.email());
+
+        // Log out before trying to create game
+        facade.logout(authToken);
+
+        assertThrows(ResponseException.class, () -> facade.createGame(authToken, randomString(8)));
+    }
+
+    @Test
     void joinGame() {
     }
 
