@@ -86,6 +86,16 @@ public class ServerFacadeTests {
     }
 
     @Test
+    void logoutUserNotLoggedIn() throws ResponseException {
+        UserData user = randomUser();
+        String authToken = facade.register(user.username(), user.password(), user.email());
+        assertDoesNotThrow(() -> dataAccess.getUserFromAuth(authToken));
+
+        assertDoesNotThrow(() -> facade.logout(authToken)); // Log out
+        assertThrows(ResponseException.class, () -> facade.logout(authToken)); // Should already be logged out
+    }
+
+    @Test
     void listGames() {
     }
 
