@@ -75,11 +75,14 @@ public class ChessClient {
                     buildUsageMessage(
                             "register", "<username> <password> <email>", "Register a new account and log in."
                     )
-            )); // TODO
+            ));
             case PostLogin -> String.join("\n", List.of(
                     SET_TEXT_COLOR_BLUE + "====Post-Login Commands====" + RESET_TEXT_COLOR,
                     buildUsageMessage(
                             "logout", null, "Log out of the current account."
+                    ),
+                    buildUsageMessage(
+                            "create", "<name>", "Create a new chess game with the given name."
                     )
             )); // TODO
             case Gameplay -> String.join("\n", List.of(
@@ -88,7 +91,7 @@ public class ChessClient {
         };
 
         String statelessCommands = String.join("\n", List.of(
-                buildUsageMessage("quit", null, "Quit the Chess client."),
+                buildUsageMessage("quit", null, "Quit the Chess client, logging out if necessary."),
                 buildUsageMessage("help", null, "Display this message.")
         ));
 
@@ -96,7 +99,17 @@ public class ChessClient {
     }
 
     private String quit() {
-        System.out.println("♕ Goodbye! ♕");
+        if (state != ClientState.PreLogin) {
+            System.out.println("Logging out...");
+            try {
+                server.logout(authToken);
+            } catch (ResponseException e) {
+                System.out.println("Logout unsuccessful. Quitting without logging out.");
+            }
+            System.out.println("Logout successful.");
+        }
+
+        System.out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_MAGENTA + "♕ Goodbye! ♕" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR);
         return "quitting...";
     }
 
@@ -114,7 +127,7 @@ public class ChessClient {
         this.username = username;
         state = ClientState.PostLogin;
 
-        return "login successful! Welcome, " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR + "!" +
+        return "login successful! Welcome, " + SET_TEXT_BOLD + username + RESET_TEXT_BOLD_FAINT + "!" +
                 " Type `help` for a list of post-login commands.";
     }
 
@@ -133,7 +146,7 @@ public class ChessClient {
         this.username = username;
         state = ClientState.PostLogin;
 
-        return "Registration successful! You are now logged in as " + SET_TEXT_BOLD + username + RESET_TEXT_COLOR + "." +
+        return "Registration successful! You are now logged in as " + SET_TEXT_BOLD + username + RESET_TEXT_BOLD_FAINT + "." +
                 " Type `help` for a list of post-login commands.";
     }
 
@@ -149,8 +162,18 @@ public class ChessClient {
     }
 
     private String createGame(String[] args) throws ResponseException {
-        // TODO
-        throw new ResponseException("Not implemented yet!");
+        assertLoggedIn();
+        if (args.length < 1) {
+            throw new ResponseException("Usage: " + buildUsageMessage(
+                    "create", "<name>"
+            ));
+        }
+
+        String gameName = String.join(" ", args);
+
+        server.createGame(authToken, gameName);
+
+        return "game " + SET_TEXT_BOLD + gameName + RESET_TEXT_BOLD_FAINT + " successfully created!";
     }
 
     private String listGames(String[] args) throws ResponseException {
