@@ -193,4 +193,12 @@ public class ChessClient {
 
         return stringBuilder.toString();
     }
+
+    private void assertLoggedIn() throws ResponseException {
+        if (state == ClientState.PreLogin) {
+            throw new ResponseException(
+                    "Error: You are not logged in. Please log in using `login`, or create a new account using 'register'."
+            );
+        }
+    }
 }
