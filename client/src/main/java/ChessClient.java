@@ -1,7 +1,9 @@
+import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 
@@ -12,6 +14,7 @@ public class ChessClient {
     private ClientState state;
     private String username;
     private String authToken;
+    private List<GameData> gameList;
 
     public enum ClientState {
         PreLogin, PostLogin, Gameplay
@@ -83,6 +86,9 @@ public class ChessClient {
                     ),
                     buildUsageMessage(
                             "create", "<name>", "Create a new chess game with the given name."
+                    ),
+                    buildUsageMessage(
+                            "list", null, "Retrieve and list all chess games on the server."
                     )
             )); // TODO
             case Gameplay -> String.join("\n", List.of(
@@ -177,8 +183,32 @@ public class ChessClient {
     }
 
     private String listGames(String[] args) throws ResponseException {
-        // TODO
-        throw new ResponseException("Not implemented yet!");
+        assertLoggedIn();
+
+        gameList = List.copyOf(server.listGames(authToken));
+
+        return displayGameList();
+    }
+
+    private String displayGameList() {
+        var stringBuilder = new StringBuilder();
+
+        stringBuilder.append(SET_TEXT_COLOR_BLUE).append("====Games List====").append(RESET_TEXT_COLOR).append("\n");
+        for (int i = 0; i < gameList.size(); i++) {
+            GameData game = gameList.get(i);
+            stringBuilder
+                    .append(SET_TEXT_BOLD).append(i + 1).append(". ").append(RESET_TEXT_BOLD_FAINT)
+                    .append(SET_TEXT_COLOR_YELLOW).append(game.gameName())
+                    .append("; ").append(SET_TEXT_COLOR_BLUE).append(SET_TEXT_BOLD).append("White: ").append(RESET_TEXT_BOLD_FAINT)
+                    .append((game.whiteUsername() != null) ? game.whiteUsername() : "none")
+                    .append("; ").append(SET_TEXT_COLOR_MAGENTA).append(SET_TEXT_BOLD).append("Black: ").append(RESET_TEXT_BOLD_FAINT)
+                    .append((game.blackUsername() != null) ? game.blackUsername() : "none")
+                    .append(RESET_TEXT_COLOR).append("\n")
+            ;
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1); // remove last newline
+
+        return stringBuilder.toString();
     }
 
     private String playGame(String[] args) throws ResponseException {
