@@ -7,6 +7,7 @@ import model.GameData;
 import model.UserData;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -192,6 +193,8 @@ public class ServerFacade {
         HttpResponse<String> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException e) {
+            throw new ResponseException("Unable to establish connection to the server.");
         } catch (IOException | InterruptedException e) {
             throw new ResponseException(e);
         }
