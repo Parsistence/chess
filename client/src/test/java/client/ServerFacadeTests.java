@@ -120,6 +120,22 @@ public class ServerFacadeTests {
     }
 
     @Test
+    void listGamesWithoutAuth() throws DataAccessException, ResponseException {
+        // Add some games to database
+        GameData game1 = dataAccess.createGame("1_" + randomString(8));
+        GameData game2 = dataAccess.createGame("2_" + randomString(8));
+        GameData game3 = dataAccess.createGame("3_" + randomString(8));
+
+        // Register a user and log out
+        UserData user = randomUser();
+        String authToken = facade.register(user.username(), user.password(), user.email());
+        facade.logout(authToken);
+
+        // Shouldn't get list of games with bad auth
+        assertThrows(ResponseException.class, () -> facade.listGames(authToken));
+    }
+
+    @Test
     void createGame() {
     }
 
