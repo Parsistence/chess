@@ -72,10 +72,12 @@ public class ChessClient {
                             "login", " <username> <password>", "Log in with an existing account."
                     )
             )); // TODO
-            case PostLogin -> """
-                    Post-Login commands go here!"""; // TODO
-            case Gameplay -> """
-                    Gameplay commands go here!"""; // TODO
+            case PostLogin -> String.join("\n", List.of(
+                    SET_TEXT_COLOR_BLUE + "====Post-Login Commands====" + RESET_TEXT_COLOR
+            )); // TODO
+            case Gameplay -> String.join("\n", List.of(
+                    SET_TEXT_COLOR_BLUE + "====Gameplay Commands====" + RESET_TEXT_COLOR
+            )); // TODO
         };
     }
 
