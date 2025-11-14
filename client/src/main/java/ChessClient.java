@@ -25,7 +25,7 @@ public class ChessClient {
         var scanner = new Scanner(System.in);
 
         String result = "";
-        while (!result.equals("quit")) {
+        while (!result.equals("quitting...")) {
             String input = promptInput(scanner);
 
             try {
@@ -59,14 +59,18 @@ public class ChessClient {
                 default -> help();
             };
         } catch (ResponseException e) {
-            return SET_TEXT_COLOR_RED + "Error: " + e.getMessage() + RESET_TEXT_COLOR;
+            return SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR;
         }
     }
 
     private String help() {
         return switch (state) {
-            case PreLogin -> SET_TEXT_COLOR_BLUE + "====Pre-Login Commands====\n" +
-                    RESET_TEXT_COLOR; // TODO
+            case PreLogin -> SET_TEXT_COLOR_BLUE + "====Pre-Login Commands====" + RESET_TEXT_COLOR +
+                    // login
+                    SET_TEXT_COLOR_YELLOW + "\nlogin" + SET_TEXT_COLOR_BLUE + " <username> <password>" +
+                    SET_TEXT_COLOR_MAGENTA + " - Log in with an existing account." +
+                    RESET_TEXT_COLOR
+            ; // TODO
             case PostLogin -> """
                     Post-Login commands go here!"""; // TODO
             case Gameplay -> """
@@ -76,12 +80,14 @@ public class ChessClient {
 
     private String quit() {
         System.out.println("♕ Goodbye! ♕");
-        return "quit";
+        return "quitting...";
     }
 
     private String login(String[] args) throws ResponseException {
         if (args.length < 2) {
-            throw new ResponseException("Usage: login <username> <password>");
+            throw new ResponseException(
+                    "Usage: " + SET_TEXT_COLOR_BLUE + "login" + RESET_TEXT_COLOR + " <username> <password>"
+            );
         }
 
         String username = args[0];
