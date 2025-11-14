@@ -136,7 +136,13 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void createGame() {
+    void createGame() throws ResponseException {
+        UserData user = randomUser();
+        String authToken = facade.register(user.username(), user.password(), user.email());
+
+        int gameID = facade.createGame(authToken, randomString(8));
+        assertTrue(gameID != 0);
+        assertDoesNotThrow(() -> dataAccess.getGame(gameID));
     }
 
     @Test
