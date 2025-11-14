@@ -9,6 +9,7 @@ import static ui.EscapeSequences.*;
 public class ChessClient {
     private final ServerFacade server;
     private ClientState state;
+    private String authToken;
 
     public enum ClientState {
         PreLogin, PostLogin, Gameplay
@@ -79,8 +80,17 @@ public class ChessClient {
     }
 
     private String login(String[] args) throws ResponseException {
-        // TODO
-        throw new ResponseException("Not implemented yet!");
+        if (args.length < 2) {
+            throw new ResponseException("Usage: login <username> <password>");
+        }
+
+        String username = args[0];
+        String password = args[1];
+        authToken = server.login(username, password);
+
+        state = ClientState.PostLogin;
+
+        return "login successful!";
     }
 
     private String register(String[] args) throws ResponseException {
