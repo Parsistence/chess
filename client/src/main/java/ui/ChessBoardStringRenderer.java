@@ -14,7 +14,7 @@ public class ChessBoardStringRenderer {
      * @return The string representation of the chess board.
      */
     public String renderBoard(ChessBoard board) {
-        return renderBoard(board, TeamColor.WHITE);
+        return renderBoardWhite(board);
     }
 
     /**
