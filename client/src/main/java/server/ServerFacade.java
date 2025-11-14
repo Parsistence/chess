@@ -20,6 +20,11 @@ public class ServerFacade {
     private final Gson gson = new Gson();
     private final String serverUrl;
 
+    /**
+     * Create a new ServerFacade, which handles HTTP requests to the server behind the scenes.
+     *
+     * @param serverUrl The URL of the server to communicate with.
+     */
     public ServerFacade(String serverUrl) {
         this.serverUrl = serverUrl;
     }
@@ -69,12 +74,26 @@ public class ServerFacade {
         return authData.authToken();
     }
 
+    /**
+     * Logout an existing user.
+     *
+     * @param authToken The auth token associated with the logged-in user.
+     * @throws ResponseException If there is an issue communicating with the server,
+     *                           such as the auth token not found in the database.
+     */
     public void logout(String authToken) throws ResponseException {
         HttpHeader authHeader = new HttpHeader("authorization", authToken);
         HttpRequest request = buildHttpRequest("DELETE", "/session", null, authHeader);
         sendHttpRequest(request); // No response body
     }
 
+    /**
+     * List all games in the database.
+     *
+     * @param authToken The auth token associated with the user.
+     * @return A Collection of GameData objects.
+     * @throws ResponseException If there is an issue communicating with the server.
+     */
     public Collection<GameData> listGames(String authToken) throws ResponseException {
         HttpHeader authHeader = new HttpHeader("authorization", authToken);
         HttpRequest request = buildHttpRequest("GET", "/game", null, authHeader);
@@ -89,6 +108,15 @@ public class ServerFacade {
         return games;
     }
 
+    /**
+     * Create a new chess game.
+     *
+     * @param authToken The auth token associated with the user.
+     * @param gameName  The name to give the new game.
+     * @return The integer ID of the game.
+     * @throws ResponseException If there was an issue communicating with the server,
+     *                           such as trying to create a game with a name that already exists.
+     */
     public int createGame(String authToken, String gameName) throws ResponseException {
         HttpHeader authHeader = new HttpHeader("authorization", authToken);
         var requestBody = new CreateGameRequest(gameName);
@@ -104,6 +132,15 @@ public class ServerFacade {
         return gameID;
     }
 
+    /**
+     * Join an existing game with the given team color.
+     *
+     * @param authToken   The auth token associated with the joining user.
+     * @param playerColor The team color the joining user will join as.
+     * @param gameID      The integer ID of the game to join.
+     * @throws ResponseException If there is an issue communicating with the server,
+     *                           such as the given player color already taken.
+     */
     public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws ResponseException {
         HttpHeader authHeader = new HttpHeader("authorization", authToken);
         var requestBody = new JoinGameRequest(playerColor, gameID);
@@ -111,10 +148,27 @@ public class ServerFacade {
         sendHttpRequest(request); // No response body
     }
 
+    /**
+     * Build an HttpRequest object given a method, path, and body.
+     *
+     * @param method The method of the request.
+     * @param path   The path of the request.
+     * @param body   The object representing the request body. This will be serialized into JSON format.
+     * @return The resultant HttpRequest.
+     */
     private HttpRequest buildHttpRequest(String method, String path, Object body) {
         return buildHttpRequest(method, path, body, null);
     }
 
+    /**
+     * Build an HttpRequest object given a method, path, body, and header.
+     *
+     * @param method The method of the request.
+     * @param path   The path of the request.
+     * @param body   The object representing the request body. This will be serialized into JSON format.
+     * @param header (Optional) An HttpHeader record represent the name and value of the header.
+     * @return The resultant HttpRequest.
+     */
     private HttpRequest buildHttpRequest(String method, String path, Object body, HttpHeader header) {
         BodyPublisher requestBody = BodyPublishers.ofString(gson.toJson(body));
         var builder = HttpRequest.newBuilder()
@@ -126,6 +180,14 @@ public class ServerFacade {
         return builder.build();
     }
 
+    /**
+     * Send an HttpRequest to the server.
+     *
+     * @param request The HttpRequest to send.
+     * @return The HttpResponse received from the server.
+     * @throws ResponseException If there was an issue communicating with the server,
+     *                           including if any status code other than 2XX was received.
+     */
     private HttpResponse<String> sendHttpRequest(HttpRequest request) throws ResponseException {
         HttpResponse<String> response;
         try {
