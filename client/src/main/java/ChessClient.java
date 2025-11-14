@@ -1,6 +1,5 @@
 import server.ResponseException;
 import server.ServerFacade;
-import ui.EscapeSequences;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -50,9 +49,9 @@ public class ChessClient {
                 case "register" -> register(args);
 
                 // PostLogin
-                case "logout" -> logout(args);
-                case "create-game" -> createGame(args);
-                case "list-games" -> listGames(args);
+                case "logout" -> logout();
+                case "create" -> createGame(args);
+                case "list" -> listGames(args);
                 case "play" -> playGame(args);
                 case "observe" -> observeGame(args);
 
@@ -63,14 +62,20 @@ public class ChessClient {
         }
     }
 
-    private String help() throws ResponseException {
-        // TODO
-        throw new ResponseException("Not implemented yet!");
+    private String help() {
+        return switch (state) {
+            case PreLogin -> SET_TEXT_COLOR_BLUE + "====Pre-Login Commands====\n" +
+                    RESET_TEXT_COLOR; // TODO
+            case PostLogin -> """
+                    Post-Login commands go here!"""; // TODO
+            case Gameplay -> """
+                    Gameplay commands go here!"""; // TODO
+        };
     }
 
-    private String quit() throws ResponseException {
-        // TODO
-        throw new ResponseException("Not implemented yet!");
+    private String quit() {
+        System.out.println("♕ Goodbye! ♕");
+        return "quit";
     }
 
     private String login(String[] args) throws ResponseException {
@@ -83,7 +88,7 @@ public class ChessClient {
         throw new ResponseException("Not implemented yet!");
     }
 
-    private String logout(String[] args) throws ResponseException {
+    private String logout() throws ResponseException {
         // TODO
         throw new ResponseException("Not implemented yet!");
     }
