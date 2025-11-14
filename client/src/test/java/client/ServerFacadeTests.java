@@ -1,6 +1,7 @@
 package client;
 
 import dataaccess.DataAccessException;
+import dataaccess.EntryNotFoundException;
 import dataaccess.MySqlDataAccess;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -69,13 +70,19 @@ public class ServerFacadeTests {
     void loginWrongPassword() throws ResponseException {
         UserData user = randomUser();
         facade.register(user.username(), user.password(), user.email());
-        
+
         String wrongPassword = "wrong_" + user.password();
         assertThrows(ResponseException.class, () -> facade.login(user.username(), wrongPassword));
     }
 
     @Test
-    void logout() {
+    void logout() throws ResponseException {
+        UserData user = randomUser();
+        String authToken = facade.register(user.username(), user.password(), user.email());
+
+        assertDoesNotThrow(() -> dataAccess.getUserFromAuth(authToken));
+        assertDoesNotThrow(() -> facade.logout(authToken));
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.getUserFromAuth(authToken));
     }
 
     @Test
