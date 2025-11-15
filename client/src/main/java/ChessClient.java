@@ -104,10 +104,10 @@ public class ChessClient {
                             "<ID>",
                             "Join an existing game as an observer. Run `list` first to update the list of games."
                     )
-            )); // TODO
+            ));
             case Gameplay -> String.join("\n", List.of(
                     SET_TEXT_COLOR_BLUE + "====Gameplay Commands====" + RESET_TEXT_COLOR
-            )); // TODO
+            )); // Phase 6: Implement these
         };
 
         String statelessCommands = String.join("\n", List.of(
@@ -286,7 +286,7 @@ public class ChessClient {
             throw new ResponseException("Error: No game found with ID " + gameListID + ".");
         }
 
-        // TODO: Join as an observer
+        // Phase 6: Join as an observer
 
         return String.join("\n", List.of(
                 "Successfully joined game " + game.gameName() + " as an observer.",
