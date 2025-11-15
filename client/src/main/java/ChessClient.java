@@ -257,9 +257,9 @@ public class ChessClient {
         server.joinGame(authToken, playerColor, realGameID);
 
         return String.join("\n", List.of(
-                "Successfully joined game " + game.gameName() + " as " + playerColor + " .",
+                "Successfully joined game " + game.gameName() + " as " + playerColor + ".",
                 "Chessboard:",
-                boardStringRenderer.renderBoard(new ChessGame().getBoard())
+                boardStringRenderer.renderBoard(new ChessGame().getBoard(), playerColor)
         ));
     }
 
