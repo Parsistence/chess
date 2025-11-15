@@ -10,7 +10,6 @@ import org.junit.jupiter.api.*;
 import server.ResponseException;
 import server.Server;
 import server.ServerFacade;
-import server.TestUtils;
 
 import java.util.Collection;
 
@@ -21,7 +20,6 @@ public class ServerFacadeTests {
     private static Server server;
     private static ServerFacade facade;
     private static MySqlDataAccess dataAccess;
-    private static final TestUtils testUtils = new TestUtils();
 
     @BeforeAll
     public static void init() throws DataAccessException {
@@ -45,7 +43,7 @@ public class ServerFacadeTests {
 
     @Test
     void register() throws ResponseException {
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         String authToken = facade.register(user.username(), user.password(), user.email());
         assertFalse(authToken.isBlank());
 
@@ -54,7 +52,7 @@ public class ServerFacadeTests {
 
     @Test
     void registerDuplicateUser() {
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         assertDoesNotThrow(() ->
                 facade.register(user.username(), user.password(), user.email())
         );
@@ -65,7 +63,7 @@ public class ServerFacadeTests {
 
     @Test
     void login() throws ResponseException {
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         facade.register(user.username(), user.password(), user.email());
 
         String authToken = facade.login(user.username(), user.password());
@@ -74,7 +72,7 @@ public class ServerFacadeTests {
 
     @Test
     void loginWrongPassword() throws ResponseException {
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         facade.register(user.username(), user.password(), user.email());
 
         String wrongPassword = "wrong_" + user.password();
@@ -83,7 +81,7 @@ public class ServerFacadeTests {
 
     @Test
     void logout() throws ResponseException {
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         String authToken = facade.register(user.username(), user.password(), user.email());
 
         assertDoesNotThrow(() -> dataAccess.getUserFromAuth(authToken));
@@ -93,7 +91,7 @@ public class ServerFacadeTests {
 
     @Test
     void logoutUserNotLoggedIn() throws ResponseException {
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         String authToken = facade.register(user.username(), user.password(), user.email());
         assertDoesNotThrow(() -> dataAccess.getUserFromAuth(authToken));
 
@@ -104,12 +102,12 @@ public class ServerFacadeTests {
     @Test
     void listGames() throws DataAccessException, ResponseException {
         // Add some games to database
-        GameData game1 = dataAccess.createGame("1_" + testUtils.randomString(8));
-        GameData game2 = dataAccess.createGame("2_" + testUtils.randomString(8));
-        GameData game3 = dataAccess.createGame("3_" + testUtils.randomString(8));
+        GameData game1 = dataAccess.createGame("1_" + randomString(8));
+        GameData game2 = dataAccess.createGame("2_" + randomString(8));
+        GameData game3 = dataAccess.createGame("3_" + randomString(8));
 
         // Register a user
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         String authToken = facade.register(user.username(), user.password(), user.email());
 
         // Get list of games
@@ -124,12 +122,12 @@ public class ServerFacadeTests {
     @Test
     void listGamesWithoutAuth() throws DataAccessException, ResponseException {
         // Add some games to database
-        dataAccess.createGame("1_" + testUtils.randomString(8));
-        dataAccess.createGame("2_" + testUtils.randomString(8));
-        dataAccess.createGame("3_" + testUtils.randomString(8));
+        dataAccess.createGame("1_" + randomString(8));
+        dataAccess.createGame("2_" + randomString(8));
+        dataAccess.createGame("3_" + randomString(8));
 
         // Register a user and log out
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         String authToken = facade.register(user.username(), user.password(), user.email());
         facade.logout(authToken);
 
@@ -139,33 +137,33 @@ public class ServerFacadeTests {
 
     @Test
     void createGame() throws ResponseException {
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         String authToken = facade.register(user.username(), user.password(), user.email());
 
-        int gameID = facade.createGame(authToken, testUtils.randomString(8));
+        int gameID = facade.createGame(authToken, randomString(8));
         assertTrue(gameID != 0);
         assertDoesNotThrow(() -> dataAccess.getGame(gameID));
     }
 
     @Test
     void createGameUnauthorized() throws ResponseException {
-        UserData user = testUtils.randomUser();
+        UserData user = randomUser();
         String authToken = facade.register(user.username(), user.password(), user.email());
 
         // Log out before trying to create game
         facade.logout(authToken);
 
-        assertThrows(ResponseException.class, () -> facade.createGame(authToken, testUtils.randomString(8)));
+        assertThrows(ResponseException.class, () -> facade.createGame(authToken, randomString(8)));
     }
 
     @Test
     void joinGame() throws ResponseException, DataAccessException {
-        UserData user1 = testUtils.randomUser();
+        UserData user1 = randomUser();
         String authToken1 = facade.register(user1.username(), user1.password(), user1.email());
-        UserData user2 = testUtils.randomUser();
+        UserData user2 = randomUser();
         String authToken2 = facade.register(user2.username(), user2.password(), user2.email());
 
-        int gameID = facade.createGame(authToken1, testUtils.randomString(8));
+        int gameID = facade.createGame(authToken1, randomString(8));
 
         // White player joins
         assertDoesNotThrow(() -> facade.joinGame(authToken1, ChessGame.TeamColor.WHITE, gameID));
@@ -180,17 +178,34 @@ public class ServerFacadeTests {
 
     @Test
     void joinGameColorTaken() throws ResponseException {
-        UserData user1 = testUtils.randomUser();
+        UserData user1 = randomUser();
         String authToken1 = facade.register(user1.username(), user1.password(), user1.email());
-        UserData user2 = testUtils.randomUser();
+        UserData user2 = randomUser();
         String authToken2 = facade.register(user2.username(), user2.password(), user2.email());
 
-        int gameID = facade.createGame(authToken1, testUtils.randomString(8));
+        int gameID = facade.createGame(authToken1, randomString(8));
 
         // user1 joins as White
         assertDoesNotThrow(() -> facade.joinGame(authToken1, ChessGame.TeamColor.WHITE, gameID));
 
         // user2 tries to join also as White
         assertThrows(ResponseException.class, () -> facade.joinGame(authToken2, ChessGame.TeamColor.WHITE, gameID));
+    }
+
+    public UserData randomUser() {
+        String username = randomString(5);
+        String password = randomString(8);
+        String email = randomString(5) + "@" + randomString(5) + ".com";
+        return new UserData(username, password, email);
+    }
+
+    public String randomString(int len) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < len; i++) {
+            char c;
+            c = (char) (Math.random() * 96 + 32);
+            builder.append(c);
+        }
+        return builder.toString();
     }
 }
