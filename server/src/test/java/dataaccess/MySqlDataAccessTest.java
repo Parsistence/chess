@@ -10,6 +10,8 @@ import service.AuthService;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static server.TestUtils.randomString;
+import static server.TestUtils.randomUser;
 
 class MySqlDataAccessTest {
     private MySqlDataAccess dataAccess;
@@ -274,27 +276,10 @@ class MySqlDataAccessTest {
         assertThrows(EntryNotFoundException.class, () -> dataAccess.updateGame(gameID, gameData));
     }
 
-    private UserData randomUser() {
-        String username = randomString(5);
-        String password = randomString(8);
-        String email = randomString(5) + "@" + randomString(5) + ".com";
-        return new UserData(username, password, email);
-    }
-
     private AuthData randomAuthData() {
         String username = randomString(5);
         String authToken = authService.generateToken();
         return new AuthData(username, authToken);
-    }
-
-    private String randomString(int len) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < len; i++) {
-            char c;
-            c = (char) (Math.random() * 96 + 32);
-            builder.append(c);
-        }
-        return builder.toString();
     }
 }
 
