@@ -5,17 +5,17 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.TestUtils;
 import service.AuthService;
 
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static server.TestUtils.randomString;
-import static server.TestUtils.randomUser;
 
 class MySqlDataAccessTest {
     private MySqlDataAccess dataAccess;
     private AuthService authService;
+    private final TestUtils testUtils = new TestUtils();
 
     @BeforeEach
     void beforeEach() throws DataAccessException {
@@ -29,9 +29,9 @@ class MySqlDataAccessTest {
 
     @Test
     void clearUsers() throws DataAccessException {
-        UserData user1 = randomUser();
-        UserData user2 = randomUser();
-        UserData user3 = randomUser();
+        UserData user1 = testUtils.randomUser();
+        UserData user2 = testUtils.randomUser();
+        UserData user3 = testUtils.randomUser();
 
         dataAccess.insertUser(user1);
         dataAccess.insertUser(user2);
@@ -65,9 +65,9 @@ class MySqlDataAccessTest {
 
     @Test
     void clearGameData() throws DataAccessException {
-        GameData game1 = dataAccess.createGame(randomString(5));
-        GameData game2 = dataAccess.createGame(randomString(5));
-        GameData game3 = dataAccess.createGame(randomString(5));
+        GameData game1 = dataAccess.createGame(testUtils.randomString(5));
+        GameData game2 = dataAccess.createGame(testUtils.randomString(5));
+        GameData game3 = dataAccess.createGame(testUtils.randomString(5));
 
         dataAccess.clearGameData();
 
@@ -78,7 +78,7 @@ class MySqlDataAccessTest {
 
     @Test
     void insertUser() throws DataAccessException {
-        UserData user = randomUser();
+        UserData user = testUtils.randomUser();
 
         assertDoesNotThrow(() -> dataAccess.insertUser(user));
 
@@ -92,7 +92,7 @@ class MySqlDataAccessTest {
 
     @Test
     void insertDuplicateUser() {
-        UserData user = randomUser();
+        UserData user = testUtils.randomUser();
 
         assertDoesNotThrow(() -> dataAccess.insertUser(user));
         assertThrows(EntryAlreadyExistsException.class, () -> dataAccess.insertUser(user));
@@ -100,7 +100,7 @@ class MySqlDataAccessTest {
 
     @Test
     void getUser() throws DataAccessException {
-        UserData user = randomUser();
+        UserData user = testUtils.randomUser();
 
         dataAccess.insertUser(user);
 
@@ -113,14 +113,14 @@ class MySqlDataAccessTest {
 
     @Test
     void getNonexistentUser() {
-        UserData user = randomUser();
+        UserData user = testUtils.randomUser();
 
         assertThrows(EntryNotFoundException.class, () -> dataAccess.getUser(user.username()));
     }
 
     @Test
     void verifyPassword() throws DataAccessException {
-        UserData user = randomUser();
+        UserData user = testUtils.randomUser();
         dataAccess.insertUser(user);
 
         assertTrue(dataAccess.verifyPassword(user.username(), user.password()));
@@ -128,10 +128,10 @@ class MySqlDataAccessTest {
 
     @Test
     void verifyIncorrectPassword() throws DataAccessException {
-        UserData user = randomUser();
+        UserData user = testUtils.randomUser();
         dataAccess.insertUser(user);
 
-        String incorrectPassword = randomString(8);
+        String incorrectPassword = testUtils.randomString(8);
         assertFalse(dataAccess.verifyPassword(user.username(), incorrectPassword));
     }
 
@@ -202,20 +202,20 @@ class MySqlDataAccessTest {
 
     @Test
     void createGame() throws DataAccessException {
-        GameData game = dataAccess.createGame(randomString(5));
+        GameData game = dataAccess.createGame(testUtils.randomString(5));
         assertEquals(game, dataAccess.getGame(game.gameID()));
     }
 
     @Test
     void createDuplicateGame() {
-        String gameName = randomString(8);
+        String gameName = testUtils.randomString(8);
         assertDoesNotThrow(() -> dataAccess.createGame(gameName));
         assertThrows(EntryAlreadyExistsException.class, () -> dataAccess.createGame(gameName));
     }
 
     @Test
     void getUserFromAuth() throws DataAccessException {
-        UserData user = randomUser();
+        UserData user = testUtils.randomUser();
         dataAccess.insertUser(user);
 
         AuthData authData = new AuthData(user.username(), authService.generateToken());
@@ -236,7 +236,7 @@ class MySqlDataAccessTest {
 
     @Test
     void getGame() throws DataAccessException {
-        GameData game = dataAccess.createGame(randomString(5));
+        GameData game = dataAccess.createGame(testUtils.randomString(5));
 
         GameData savedGame = dataAccess.getGame(game.gameID());
         assertEquals(game, savedGame);
@@ -250,10 +250,10 @@ class MySqlDataAccessTest {
 
     @Test
     void updateGame() throws DataAccessException {
-        GameData game = dataAccess.createGame(randomString(8));
+        GameData game = dataAccess.createGame(testUtils.randomString(8));
 
-        String newWhiteUsername = randomString(5);
-        String newBlackUsername = randomString(5);
+        String newWhiteUsername = testUtils.randomString(5);
+        String newBlackUsername = testUtils.randomString(5);
         GameData updatedGame = new GameData(
                 game.gameID(),
                 newWhiteUsername,
@@ -271,13 +271,13 @@ class MySqlDataAccessTest {
     void updateNonexistentGame() {
         int gameID = (int) (Math.random() * 1000);
 
-        GameData gameData = new GameData(gameID, randomString(8));
+        GameData gameData = new GameData(gameID, testUtils.randomString(8));
 
         assertThrows(EntryNotFoundException.class, () -> dataAccess.updateGame(gameID, gameData));
     }
 
     private AuthData randomAuthData() {
-        String username = randomString(5);
+        String username = testUtils.randomString(5);
         String authToken = authService.generateToken();
         return new AuthData(username, authToken);
     }
