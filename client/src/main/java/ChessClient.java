@@ -251,7 +251,7 @@ public class ChessClient {
             game = gameList.get(gameListID);
             realGameID = game.gameID();
         } catch (Throwable e) {
-            throw new ResponseException("Error: No game found with ID " + gameListID + ".");
+            throw new ResponseException("Error: No game found with ID " + (gameListID + 1) + ".");
         }
 
         server.joinGame(authToken, playerColor, realGameID);
@@ -283,7 +283,7 @@ public class ChessClient {
             game = gameList.get(gameListID);
             realGameID = game.gameID();
         } catch (Throwable e) {
-            throw new ResponseException("Error: No game found with ID " + gameListID + ".");
+            throw new ResponseException("Error: No game found with ID " + (gameListID + 1) + ".");
         }
 
         // Phase 6: Join as an observer
