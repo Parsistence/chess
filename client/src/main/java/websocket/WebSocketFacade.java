@@ -19,9 +19,8 @@ public class WebSocketFacade {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             session = container.connectToServer(this, socketUri);
 
-            session.addMessageHandler((MessageHandler.Whole<String>) msg -> {
-                throw new RuntimeException("Not implemented"); // TODO
-            });
+            var messageHandler = new ServerMessageHandler();
+            session.addMessageHandler(messageHandler);
         } catch (URISyntaxException | DeploymentException | IOException e) {
             throw new RuntimeException(e.getMessage());
         }
