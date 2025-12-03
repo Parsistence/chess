@@ -1,8 +1,32 @@
 package websocket;
 
 import chess.ChessMove;
+import jakarta.websocket.*;
+import server.ResponseException;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class WebSocketFacade {
+    private final Session session;
+
+    public WebSocketFacade(String serverUrl) throws ResponseException {
+        try {
+            String wsUrl = serverUrl.replace("http", "ws");
+            URI socketUri = new URI(wsUrl + "/ws");
+
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            session = container.connectToServer(this, socketUri);
+
+            session.addMessageHandler((MessageHandler.Whole<String>) msg -> {
+                throw new RuntimeException("Not implemented"); // TODO
+            });
+        } catch (URISyntaxException | DeploymentException | IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     /**
      * Sends a CONNECT message to the server to join a chess game.
      *
