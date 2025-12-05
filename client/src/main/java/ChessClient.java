@@ -5,6 +5,7 @@ import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.ChessBoardStringRenderer;
+import websocket.ServerMessageObserver;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class ChessClient {
+public class ChessClient implements ServerMessageObserver {
     private final ServerFacade server;
     private final ChessBoardStringRenderer boardStringRenderer = new ChessBoardStringRenderer();
     private ClientState state;
@@ -336,5 +337,36 @@ public class ChessClient {
                     "Error: You are not logged in. Please log in using `login`, or create a new account using 'register'."
             );
         }
+    }
+
+
+    /**
+     * Loads a game from the server.
+     *
+     * @param game The game data to load.
+     */
+    @Override
+    public void loadGame(ChessGame game) {
+
+    }
+
+    /**
+     * Display an error message from the server.
+     *
+     * @param errorMessage The error from the server.
+     */
+    @Override
+    public void notifyError(String errorMessage) {
+
+    }
+
+    /**
+     * Display a notification from the server.
+     *
+     * @param message notification from the server.
+     */
+    @Override
+    public void notify(String message) {
+
     }
 }
