@@ -3,6 +3,8 @@ package websocket;
 import chess.ChessMove;
 
 public class UserCommandHandler {
+    private final ConnectionManager connectionManager = new ConnectionManager();
+
     /**
      * Handles a CONNECT message to connect a user to a chess game.
      *
