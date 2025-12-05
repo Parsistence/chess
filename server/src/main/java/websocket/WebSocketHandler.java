@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 
+import java.io.IOException;
+
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     UserCommandHandler commandHandler = new UserCommandHandler();
 
@@ -28,18 +30,26 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleMessage(@NotNull WsMessageContext ctx) {
         var userGameCommand = new Gson().fromJson(ctx.message(), UserGameCommand.class);
-        switch (userGameCommand.getCommandType()) {
-            case CONNECT -> commandHandler.handleConnect(userGameCommand.getAuthToken(), userGameCommand.getGameID());
-            case MAKE_MOVE -> {
-                var makeMoveCommand = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
-                commandHandler.handleMakeMove(
-                        makeMoveCommand.getAuthToken(),
-                        makeMoveCommand.getGameID(),
-                        makeMoveCommand.getMove()
-                );
+        try {
+            switch (userGameCommand.getCommandType()) {
+                case CONNECT ->
+                        commandHandler.handleConnect(userGameCommand.getAuthToken(), userGameCommand.getGameID(), ctx.session);
+                case MAKE_MOVE -> {
+                    var makeMoveCommand = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
+                    commandHandler.handleMakeMove(
+                            makeMoveCommand.getAuthToken(),
+                            makeMoveCommand.getGameID(),
+                            makeMoveCommand.getMove(),
+                            ctx.session
+                    );
+                }
+                case LEAVE ->
+                        commandHandler.handleLeave(userGameCommand.getAuthToken(), userGameCommand.getGameID(), ctx.session);
+                case RESIGN ->
+                        commandHandler.handleResign(userGameCommand.getAuthToken(), userGameCommand.getGameID(), ctx.session);
             }
-            case LEAVE -> commandHandler.handleLeave(userGameCommand.getAuthToken(), userGameCommand.getGameID());
-            case RESIGN -> commandHandler.handleResign(userGameCommand.getAuthToken(), userGameCommand.getGameID());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
