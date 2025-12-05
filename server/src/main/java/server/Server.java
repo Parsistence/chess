@@ -12,6 +12,7 @@ import service.AuthService;
 import service.GameService;
 import service.TeamAlreadyTakenException;
 import service.UserService;
+import websocket.WebSocketHandler;
 
 import java.util.Collection;
 
@@ -38,19 +39,29 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
 
-        server.delete("db", this::clear);
-        server.post("user", this::register);
-        server.post("session", this::login);
-        server.delete("session", this::logout);
-        server.get("game", this::listGames);
-        server.post("game", this::createGame);
-        server.put("game", this::joinGame);
+        server.delete("db", this::clear)
+                .post("user", this::register)
+                .post("session", this::login)
+                .delete("session", this::logout)
+                .get("game", this::listGames)
+                .post("game", this::createGame)
+                .put("game", this::joinGame)
+        ;
 
-        server.exception(EntryAlreadyExistsException.class, this::entryAlreadyExistsException);
-        server.exception(EntryNotFoundException.class, this::entryNotFoundException);
-        server.exception(TeamAlreadyTakenException.class, this::teamAlreadyTakenExceptionHandler);
-        server.exception(DataAccessException.class, this::genericExceptionHandler);
-        server.exception(Exception.class, this::genericExceptionHandler);
+        var webSocketHandler = new WebSocketHandler();
+        server.ws("ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        })
+        ;
+
+        server.exception(EntryAlreadyExistsException.class, this::entryAlreadyExistsException)
+                .exception(EntryNotFoundException.class, this::entryNotFoundException)
+                .exception(TeamAlreadyTakenException.class, this::teamAlreadyTakenExceptionHandler)
+                .exception(DataAccessException.class, this::genericExceptionHandler)
+                .exception(Exception.class, this::genericExceptionHandler)
+        ;
     }
 
     private void joinGame(Context ctx) throws DataAccessException, TeamAlreadyTakenException {
