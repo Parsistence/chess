@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 public class WebSocketFacade {
     private final Session session;
 
-    public WebSocketFacade(String serverUrl) throws ResponseException {
+    public WebSocketFacade(String serverUrl, ServerMessageHandler messageHandler) throws ResponseException {
         try {
             String wsUrl = serverUrl.replace("http", "ws");
             URI socketUri = new URI(wsUrl + "/ws");
@@ -19,7 +19,6 @@ public class WebSocketFacade {
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             session = container.connectToServer(this, socketUri);
 
-            var messageHandler = new ServerMessageHandler();
             session.addMessageHandler(messageHandler);
         } catch (URISyntaxException | DeploymentException | IOException e) {
             throw new RuntimeException(e.getMessage());
