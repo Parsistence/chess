@@ -12,7 +12,7 @@ public class UserCommandHandler {
      * @param gameID    The ID of the chess game to connect to.
      */
     public void handleConnect(String authToken, int gameID) {
-        throw new RuntimeException("Not implemented."); // TODO
+        connectionManager.add(authToken, gameID);
     }
 
     /**
