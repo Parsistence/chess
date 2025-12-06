@@ -1,8 +1,11 @@
 package websocket;
 
 import chess.ChessGame;
+import chess.ChessGame.WinState;
 import chess.ChessMove;
+import chess.InvalidMoveException;
 import dataaccess.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
@@ -38,8 +41,94 @@ public class UserCommandHandler {
      * @param move      The move to make.
      * @param session   The user's session.
      */
-    public void handleMakeMove(String authToken, int gameID, ChessMove move, Session session) {
-        throw new RuntimeException("Not implemented."); // TODO
+    public void handleMakeMove(String authToken, int gameID, ChessMove move, Session session) throws IOException {
+        try {
+            var teamColor = connectionManager.getTeamColor(session, gameID);
+            GameData gameData = dataAccess.getGame(gameID);
+            ChessGame game = gameData.game();
+            String errorMessage = buildErrorMessage(game, teamColor);
+            if (errorMessage != null) {
+                connectionManager.sendError(session, errorMessage);
+                return;
+            }
+
+            try {
+                game.makeMove(move);
+            } catch (InvalidMoveException e) {
+                connectionManager.sendError(session, e.getMessage());
+                return;
+            }
+
+            connectionManager.broadcastGame(gameID);
+            connectionManager.sendMessage(session, "Move made successfully!");
+            String username = dataAccess.getUserFromAuth(authToken).username();
+            connectionManager.broadcastExcluding(username + " has made their move!", gameID, session);
+
+            var winState = game.getWinState();
+            if (winState != WinState.IN_PROGRESS) {
+                broadcastWinState(gameID, session, winState, gameData);
+            }
+        } catch (DataAccessException e) {
+            connectionManager.sendError(session, e.getMessage());
+        }
+    }
+
+    /**
+     * Broadcast the win state of the chess game to all connected sessions.
+     *
+     * @param gameID   The ID of the game.
+     * @param session  The session of the player that ended the game.
+     * @param winState The WinState of the game.
+     * @param gameData The GameData for the game.
+     * @throws IOException If there was an issue with the websocket communication.
+     */
+    private void broadcastWinState(int gameID, Session session, WinState winState, GameData gameData) throws IOException {
+        String userMessage = null;
+        String broadcastMessage = null;
+        switch (winState) {
+            case WHITE_BEAT_BLACK -> {
+                userMessage = "You put " + gameData.blackUsername() + " in checkmate. Congratulations, you win!";
+                broadcastMessage = gameData.whiteUsername() + " put " + gameData.blackUsername() + " in checkmate. Game over, White wins!";
+            }
+            case BLACK_BEAT_WHITE -> {
+                userMessage = "You put " + gameData.whiteUsername() + " in checkmate. Congratulations, you win!";
+                broadcastMessage = gameData.blackUsername() + " put " + gameData.whiteUsername() + " in checkmate. Game over, Black wins!";
+            }
+            case STALEMATE -> {
+                userMessage = gameData.whiteUsername() + " and " + gameData.blackUsername() + "are in stalemate. Game over!";
+                broadcastMessage = userMessage;
+            }
+            case WHITE_RESIGNED -> {
+                userMessage = "You resigned. Game over!";
+                broadcastMessage = gameData.whiteUsername() + " resigned. Game over!";
+            }
+            case BLACK_RESIGNED -> {
+                userMessage = "You resigned. Game over!";
+                broadcastMessage = gameData.blackUsername() + " resigned. Game over!";
+            }
+        }
+        connectionManager.sendMessage(session, userMessage);
+        connectionManager.broadcastExcluding(broadcastMessage, gameID, session);
+    }
+
+    /**
+     * Build an error message based on the game and session states.
+     *
+     * @param game      The chess game.
+     * @param teamColor The team color of the session.
+     * @return A string representing the error if an error was encountered; null otherwise.
+     */
+    private String buildErrorMessage(ChessGame game, ChessGame.TeamColor teamColor) {
+        ChessGame.TeamColor teamTurnColor = game.getTeamTurn();
+        String errorMessage = null;
+        if (teamColor == null) {
+            errorMessage = "Session is not connected as a player for this game.";
+        } else if (game.getWinState() != WinState.IN_PROGRESS) {
+            errorMessage = "Game has ended and no moves can be made.";
+        } else if (teamColor != teamTurnColor) {
+            errorMessage = "It is not your turn to make a move.";
+        }
+        return errorMessage;
     }
 
     /**
