@@ -16,11 +16,51 @@ public class ChessGame {
     private ChessBoard board;
     private TeamColor teamTurn;
 
+    public enum WinState {
+        IN_PROGRESS,
+        WHITE_BEAT_BLACK,
+        BLACK_BEAT_WHITE,
+        STALEMATE,
+        WHITE_RESIGNED,
+        BLACK_RESIGNED,
+    }
+
+    private WinState winState = WinState.IN_PROGRESS;
+
     public ChessGame() {
         this.board = new ChessBoard();
         this.board.resetBoard();
 
         this.teamTurn = TeamColor.WHITE;
+    }
+
+    /**
+     * Gets the win state of a chess game. This will be:
+     * <ol>
+     *     <li><code>IN_PROGRESS</code>: If the game is still in progress.</li>
+     *     <li><code>WHITE_BEAT_BLACK</code>: If White put Black in checkmate.</li>
+     *     <li><code>BLACK_BEAT_WHITE</code>: If Black put White in checkmate.</li>
+     *     <li><code>STALEMATE</code>: If both teams are in stalemate.</li>
+     *     <li><code>WHITE_RESIGNED</code>: If White resigned.</li>
+     *     <li><code>BLACK_RESIGNED</code>: If Black resigned.</li>
+     * </ol>
+     *
+     * @return The current win state.
+     */
+    public WinState getWinState() {
+        return winState;
+    }
+
+    /**
+     * Resigns a team color from the game, permanently changing the game's win state to <code>&lt;COLOR&gt;_RESIGNED</code>.
+     *
+     * @param teamColor The team color to resign.
+     */
+    public void resignTeam(TeamColor teamColor) {
+        winState = switch (teamColor) {
+            case WHITE -> WinState.WHITE_RESIGNED;
+            case BLACK -> WinState.BLACK_RESIGNED;
+        };
     }
 
     /**
@@ -102,12 +142,33 @@ public class ChessGame {
         // Try to make the move
         try {
             tryMove(move, true);
+            updateWinState();
         } catch (InvalidMoveException e) {
             // If move was invalid, reset the board and pass along the exception
             board = new ChessBoard(boardClone);
             throw e;
         }
 
+    }
+
+    /**
+     * Updates the win state based on the game's current conditions.
+     */
+    private void updateWinState() {
+        // Skip this if a team resigned
+        if (winState == WinState.WHITE_RESIGNED || winState == WinState.BLACK_RESIGNED) {
+            return;
+        }
+
+        if (isInCheckmate(TeamColor.WHITE)) {
+            winState = WinState.BLACK_BEAT_WHITE;
+        } else if (isInCheckmate(TeamColor.BLACK)) {
+            winState = WinState.WHITE_BEAT_BLACK;
+        } else if (isInStalemate(getTeamTurn())) {
+            winState = WinState.STALEMATE;
+        } else {
+            winState = WinState.IN_PROGRESS;
+        }
     }
 
     /**
