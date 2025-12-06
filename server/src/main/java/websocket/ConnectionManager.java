@@ -1,6 +1,7 @@
 package websocket;
 
 import chess.ChessGame;
+import chess.ChessGame.TeamColor;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.GameData;
@@ -37,6 +38,14 @@ public class ConnectionManager {
      */
     public Collection<Session> getGameSessions(int gameID) {
         return getGameConnections(gameID).keySet();
+    }
+
+    public TeamColor getTeamColor(Session session, int gameID) {
+        return switch (getGameConnections(gameID).get(session)) {
+            case WHITE_PLAYER -> TeamColor.WHITE;
+            case BLACK_PLAYER -> TeamColor.BLACK;
+            default -> null;
+        };
     }
 
     /**
