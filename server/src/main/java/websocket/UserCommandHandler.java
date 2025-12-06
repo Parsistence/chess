@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import dataaccess.*;
 import org.eclipse.jetty.websocket.api.Session;
@@ -63,8 +64,21 @@ public class UserCommandHandler {
      * @param gameID    The ID of the chess game to leave.
      * @param session   The user's session.
      */
-    public void handleResign(String authToken, int gameID, Session session) {
-        throw new RuntimeException("Not implemented."); // TODO
+    public void handleResign(String authToken, int gameID, Session session) throws IOException {
+        ChessGame.TeamColor teamColor = connectionManager.getTeamColor(session, gameID);
+        if (teamColor == null) {
+            connectionManager.sendError(session, "Session is not connected as a player for this game.");
+            return;
+        }
+
+        try {
+            dataAccess.getGame(gameID).game().resignTeam(teamColor);
+            connectionManager.sendMessage(session, "Successfully resigned from the game.");
+            String username = dataAccess.getUserFromAuth(authToken).username();
+            connectionManager.broadcastExcluding(username + " resigned from the game.", gameID, session);
+        } catch (DataAccessException e) {
+            connectionManager.sendError(session, e.getMessage());
+        }
     }
 
 }
