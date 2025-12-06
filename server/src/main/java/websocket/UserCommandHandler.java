@@ -1,6 +1,7 @@
 package websocket;
 
 import chess.ChessGame;
+import chess.ChessGame.TeamColor;
 import chess.ChessGame.WinState;
 import chess.ChessMove;
 import chess.InvalidMoveException;
@@ -52,7 +53,7 @@ public class UserCommandHandler {
             GameData gameData = dataAccess.getGame(gameID);
             ChessGame game = gameData.game();
 
-            ChessGame.TeamColor teamTurnColor = game.getTeamTurn();
+            TeamColor teamTurnColor = game.getTeamTurn();
             String errorMessage = buildErrorMessage(game, teamColor, teamTurnColor);
             if (errorMessage != null) {
                 connectionManager.sendError(session, errorMessage);
@@ -127,7 +128,7 @@ public class UserCommandHandler {
      * @param teamTurnColor The team color of the team whose turn it is.
      * @return A string representing the error if an error was encountered; null otherwise.
      */
-    private String buildErrorMessage(ChessGame game, ChessGame.TeamColor teamColor, ChessGame.TeamColor teamTurnColor) {
+    private String buildErrorMessage(ChessGame game, TeamColor teamColor, TeamColor teamTurnColor) {
         String errorMessage = null;
         if (teamColor == null) {
             errorMessage = "Session is not connected as a player for this game.";
@@ -148,6 +149,14 @@ public class UserCommandHandler {
      */
     public void handleLeave(String authToken, int gameID, Session session) throws IOException {
         try {
+            var gameData = dataAccess.getGame(gameID);
+            String username = dataAccess.getUserFromAuth(authToken).username();
+            TeamColor teamColor = gameData.getTeamOfPlayer(username);
+            var updatedGameData = gameData.withPlayers(
+                    (teamColor == TeamColor.WHITE) ? null : gameData.whiteUsername(),
+                    (teamColor == TeamColor.BLACK) ? null : gameData.blackUsername()
+            );
+            dataAccess.updateGameData(gameID, updatedGameData);
             connectionManager.remove(authToken, gameID, session);
         } catch (DataAccessException e) {
             connectionManager.sendError(session, e.getMessage());
@@ -163,7 +172,7 @@ public class UserCommandHandler {
      */
     public void handleResign(String authToken, int gameID, Session session) throws IOException {
         try {
-            ChessGame.TeamColor teamColor = connectionManager.getTeamColor(session, gameID);
+            TeamColor teamColor = connectionManager.getTeamColor(session, gameID);
             ChessGame game = dataAccess.getGame(gameID).game();
             if (teamColor == null) {
                 connectionManager.sendError(session, "Session is not connected as a player for this game.");
