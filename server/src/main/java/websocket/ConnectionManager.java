@@ -23,6 +23,7 @@ public class ConnectionManager {
         WHITE_PLAYER, BLACK_PLAYER, OBSERVER
     }
 
+    private final ConcurrentHashMap<String, Session> authorizedSessions = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, HashMap<Session, UserType>> connections = new ConcurrentHashMap<>();
     private final DataAccess dataAccess = new MySqlDataAccess();
 
@@ -38,6 +39,16 @@ public class ConnectionManager {
      */
     public Collection<Session> getGameSessions(int gameID) {
         return getGameConnections(gameID).keySet();
+    }
+
+    /**
+     * Get a session given an auth token.
+     *
+     * @param authToken The auth token associated with the session.
+     * @return The corresponding session.
+     */
+    public Session getAuthorizedSession(String authToken) {
+        return authorizedSessions.get(authToken);
     }
 
     public TeamColor getTeamColor(Session session, int gameID) {
@@ -56,6 +67,8 @@ public class ConnectionManager {
      * @throws EntryNotFoundException If the authenticated user is not found in the database.
      */
     public void add(String authToken, int gameID, Session session) throws DataAccessException, IOException {
+        authorizedSessions.put(authToken, session);
+
         String username = dataAccess.getUserFromAuth(authToken).username();
         GameData game = dataAccess.getGame(gameID);
 
