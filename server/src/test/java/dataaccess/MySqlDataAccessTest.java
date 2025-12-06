@@ -249,7 +249,7 @@ class MySqlDataAccessTest {
     }
 
     @Test
-    void updateGame() throws DataAccessException {
+    void updateGameData() throws DataAccessException {
         GameData game = dataAccess.createGame(testUtils.randomString(8));
 
         String newWhiteUsername = testUtils.randomString(5);
@@ -262,7 +262,7 @@ class MySqlDataAccessTest {
                 game.game()
         );
 
-        assertDoesNotThrow(() -> dataAccess.updateGame(game.gameID(), updatedGame));
+        assertDoesNotThrow(() -> dataAccess.updateGameData(game.gameID(), updatedGame));
         assertEquals(updatedGame, dataAccess.getGame(game.gameID()));
         assertNotEquals(game, dataAccess.getGame(game.gameID()));
     }
@@ -273,7 +273,7 @@ class MySqlDataAccessTest {
 
         GameData gameData = new GameData(gameID, testUtils.randomString(8));
 
-        assertThrows(EntryNotFoundException.class, () -> dataAccess.updateGame(gameID, gameData));
+        assertThrows(EntryNotFoundException.class, () -> dataAccess.updateGameData(gameID, gameData));
     }
 
     private AuthData randomAuthData() {
