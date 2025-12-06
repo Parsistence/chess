@@ -162,14 +162,18 @@ public class UserCommandHandler {
      * @param session   The user's session.
      */
     public void handleResign(String authToken, int gameID, Session session) throws IOException {
-        ChessGame.TeamColor teamColor = connectionManager.getTeamColor(session, gameID);
-        if (teamColor == null) {
-            connectionManager.sendError(session, "Session is not connected as a player for this game.");
-            return;
-        }
-
         try {
-            dataAccess.getGame(gameID).game().resignTeam(teamColor);
+            ChessGame.TeamColor teamColor = connectionManager.getTeamColor(session, gameID);
+            ChessGame game = dataAccess.getGame(gameID).game();
+            if (teamColor == null) {
+                connectionManager.sendError(session, "Session is not connected as a player for this game.");
+                return;
+            } else if (game.getWinState() != WinState.IN_PROGRESS) {
+                connectionManager.sendError(session, "Game has ended and no moves can be made.");
+                return;
+            }
+            game.resignTeam(teamColor);
+            dataAccess.updateGame(gameID, game);
             connectionManager.sendMessage(session, "Successfully resigned from the game.");
             String username = dataAccess.getUserFromAuth(authToken).username();
             connectionManager.broadcastExcluding(username + " resigned from the game.", gameID, session);
