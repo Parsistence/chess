@@ -1,39 +1,52 @@
 package websocket;
 
-import dataaccess.DataAccessException;
-import dataaccess.EntryNotFoundException;
-import dataaccess.MemoryDataAccess;
+import chess.ChessGame;
+import com.google.gson.Gson;
+import dataaccess.*;
 import model.GameData;
-import model.UserData;
+import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
 
 public class ConnectionManager {
+    public ConnectionManager() throws DataAccessException {
+    }
+
     public enum UserType {
         WHITE_PLAYER, BLACK_PLAYER, OBSERVER
     }
 
-    private final ConcurrentHashMap<Integer, HashMap<String, UserType>> connections = new ConcurrentHashMap<>();
-    private final MemoryDataAccess dataAccess = new MemoryDataAccess();
+    private final ConcurrentHashMap<Integer, HashMap<Session, UserType>> connections = new ConcurrentHashMap<>();
+    private final DataAccess dataAccess = new MySqlDataAccess();
 
-    private HashMap<String, UserType> getGameConnections(int gameID) {
+    private HashMap<Session, UserType> getGameConnections(int gameID) {
         return connections.computeIfAbsent(gameID, k -> new HashMap<>());
     }
 
+    /**
+     * Get all sessions that belong to a game.
+     *
+     * @param gameID The ID of the chess game.
+     * @return All sessions currently connected to the game.
+     */
+    public Collection<Session> getGameSessions(int gameID) {
+        return getGameConnections(gameID).keySet();
+    }
 
     /**
      * Adds an authenticated user to an existing game and calls the given callback function.
      *
      * @param authToken The auth token of the user.
      * @param gameID    The ID of the chess game to join.
-     * @param callback  The callback function to call, which accepts the username and user type
-     *                  of the user that was added.
      * @throws EntryNotFoundException If the authenticated user is not found in the database.
      */
-    public void add(String authToken, int gameID, BiConsumer<String, UserType> callback) throws EntryNotFoundException {
+    public void add(String authToken, int gameID, Session session) throws DataAccessException, IOException {
         String username = dataAccess.getUserFromAuth(authToken).username();
         GameData game = dataAccess.getGame(gameID);
 
@@ -46,14 +59,47 @@ public class ConnectionManager {
             userType = UserType.OBSERVER;
         }
 
-        getGameConnections(gameID).put(authToken, userType);
+        getGameConnections(gameID).put(session, userType);
 
-        if (callback != null) {
-            callback.accept(username, userType);
+        String userTypeDescription = switch (userType) {
+            case WHITE_PLAYER -> "the white player";
+            case BLACK_PLAYER -> "the black player";
+            case OBSERVER -> "an observer";
+        };
+        broadcastExcluding(username + "joined the game as " + userTypeDescription + ".", gameID, session);
+    }
+
+    public void remove(Session session, int gameID) {
+        getGameConnections(gameID).remove(session);
+    }
+
+    /**
+     * Broadcasts a message to all users connected to a given game, optionally excluding a session.
+     *
+     * @param message         The message to broadcast.
+     * @param gameID          The game ID a session must be connected with to receive the broadcast.
+     * @param excludedSession (Optional) The session to exclude from the broadcast.
+     */
+    public void broadcastExcluding(String message, int gameID, Session excludedSession) throws IOException {
+        for (var session : getGameSessions(gameID)) {
+            if (!session.equals(excludedSession)) {
+                sendMessage(session, message);
+            }
         }
     }
 
-    public void remove(String authToken, int gameID) {
-        getGameConnections(gameID).remove(authToken);
+    void sendMessage(Session session, String message) throws IOException {
+        var notification = new NotificationMessage(message);
+        session.getRemote().sendString(new Gson().toJson(notification));
+    }
+
+    void sendGame(Session session, ChessGame game) throws IOException {
+        var loadGameMessage = new LoadGameMessage(game);
+        session.getRemote().sendString(new Gson().toJson(loadGameMessage));
+    }
+
+    void sendError(Session session, String errorMessage) throws IOException {
+        var errorServerMessage = new ErrorMessage(errorMessage);
+        session.getRemote().sendString(new Gson().toJson(errorServerMessage));
     }
 }
