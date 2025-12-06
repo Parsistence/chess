@@ -362,11 +362,11 @@ public class MySqlDataAccess implements DataAccess {
     /**
      * Updates game data in the database with the given data.
      *
-     * @param gameID      The game ID.
-     * @param updatedGame The data to update into the database.
+     * @param gameID          The game ID.
+     * @param updatedGameData The data to update into the database.
      */
     @Override
-    public void updateGame(int gameID, GameData updatedGame) throws DataAccessException {
+    public void updateGameData(int gameID, GameData updatedGameData) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
             var statementStr = """
                     UPDATE game_data
@@ -378,13 +378,44 @@ public class MySqlDataAccess implements DataAccess {
                         WHERE game_id = ?
                     """;
             try (var statement = conn.prepareStatement(statementStr)) {
-                String gameJson = new Gson().toJson(updatedGame);
+                String gameJson = new Gson().toJson(updatedGameData.game());
 
-                statement.setString(1, updatedGame.whiteUsername());
-                statement.setString(2, updatedGame.blackUsername());
-                statement.setString(3, updatedGame.gameName());
+                statement.setString(1, updatedGameData.whiteUsername());
+                statement.setString(2, updatedGameData.blackUsername());
+                statement.setString(3, updatedGameData.gameName());
                 statement.setString(4, gameJson);
                 statement.setInt(5, gameID);
+
+                if (statement.executeUpdate() == 0) {
+                    throw new EntryNotFoundException("No game found with ID " + gameID);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    /**
+     * Updates the chess game for a given game ID.
+     *
+     * @param gameID      The game ID of the game.
+     * @param updatedGame The updated ChessGame.
+     * @throws DataAccessException If there is an issue accessing data.
+     */
+    @Override
+    public void updateGame(int gameID, ChessGame updatedGame) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statementStr = """
+                    UPDATE game_data
+                        SET
+                            game = ?
+                        WHERE game_id = ?
+                    """;
+            try (var statement = conn.prepareStatement(statementStr)) {
+                String gameJson = new Gson().toJson(updatedGame);
+
+                statement.setString(1, gameJson);
+                statement.setInt(2, gameID);
 
                 if (statement.executeUpdate() == 0) {
                     throw new EntryNotFoundException("No game found with ID " + gameID);

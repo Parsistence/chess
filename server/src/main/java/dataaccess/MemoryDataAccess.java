@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -214,16 +215,42 @@ public class MemoryDataAccess implements DataAccess {
     /**
      * Updates game data in the database with the given data.
      *
-     * @param gameID      The game ID.
-     * @param updatedGame The data to update into the database.
+     * @param gameID          The game ID.
+     * @param updatedGameData The data to update into the database.
      */
     @Override
-    public void updateGame(int gameID, GameData updatedGame) throws EntryNotFoundException {
+    public void updateGameData(int gameID, GameData updatedGameData) throws EntryNotFoundException {
         if (!games.containsKey(gameID)) {
             throw new EntryNotFoundException("A game with id " + gameID + " does not exist.");
         }
 
-        games.put(gameID, updatedGame);
+        games.put(gameID, updatedGameData);
+    }
+
+    /**
+     * Updates the chess game for a given game ID.
+     *
+     * @param gameID      The game ID of the game.
+     * @param updatedGame The updated ChessGame.
+     * @throws DataAccessException If there is an issue accessing data.
+     */
+    @Override
+    public void updateGame(int gameID, ChessGame updatedGame) throws DataAccessException {
+        if (!games.containsKey(gameID)) {
+            throw new EntryNotFoundException("A game with id " + gameID + " does not exist.");
+        }
+
+        GameData gameData = games.get(gameID);
+
+        gameData = new GameData(
+                gameID,
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                updatedGame
+        );
+
+        games.put(gameID, gameData);
     }
 
     @Override
