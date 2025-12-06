@@ -48,8 +48,12 @@ public class UserCommandHandler {
      * @param gameID    The ID of the chess game to leave.
      * @param session   The user's session.
      */
-    public void handleLeave(String authToken, int gameID, Session session) {
-        connectionManager.remove(session, gameID);
+    public void handleLeave(String authToken, int gameID, Session session) throws IOException {
+        try {
+            connectionManager.remove(authToken, gameID, session);
+        } catch (DataAccessException e) {
+            connectionManager.sendError(session, e.getMessage());
+        }
     }
 
     /**
