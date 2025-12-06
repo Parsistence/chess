@@ -75,7 +75,8 @@ public class ChessGame {
             try {
                 tryMove(potentialMove, false);
                 validMoves.add(potentialMove);
-            } catch (InvalidMoveException e) {}
+            } catch (InvalidMoveException e) {
+            } // Skip if the move doesn't work
 
             // Reset board and team turn to before test move was made
             board = new ChessBoard(boardClone);
@@ -123,7 +124,7 @@ public class ChessGame {
      *     <li>Making the move puts the current team in check.</li>
      * </ul>
      *
-     * @param move chess move to perform
+     * @param move              chess move to perform
      * @param validateTeamColor if true, check to make sure the team color is correct
      *                          and update teamTurn if move is successful
      * @throws InvalidMoveException if move is invalid
