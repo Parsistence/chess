@@ -17,7 +17,8 @@ import java.util.Objects;
 public class ChessBoard {
     private final ChessPiece[][] board = new ChessPiece[8][8];
 
-    public ChessBoard() {}
+    public ChessBoard() {
+    }
 
     public ChessBoard(ChessBoard otherBoard) {
         setBoard(otherBoard.board);
@@ -25,13 +26,14 @@ public class ChessBoard {
 
     /**
      * Checks a given position to see if it is on the board.
+     *
      * @param pos The position to check.
      * @return true if pos is on the board; false otherwise.
      */
     public boolean posInBounds(ChessPosition pos) {
         try {
             var item = board[pos.getRow() - 1][pos.getColumn() - 1];
-        } catch (ArrayIndexOutOfBoundsException e ) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             return false;
         }
         return true;
@@ -39,6 +41,7 @@ public class ChessBoard {
 
     /**
      * Get the number of rows on the board.
+     *
      * @return The number of rows on the board.
      */
     public int numRows() {
@@ -47,6 +50,7 @@ public class ChessBoard {
 
     /**
      * Get the number of columns on the board.
+     *
      * @return The number of columns on the board.
      */
     public int numCols() {
@@ -274,7 +278,7 @@ public class ChessBoard {
         str.append("[");
         for (ChessPiece[] pieceArr : board) {
             str.append("[");
-            for (ChessPiece piece: pieceArr) {
+            for (ChessPiece piece : pieceArr) {
                 str.append((piece != null) ? piece.toString() : "null").append(", ");
             }
             str.append("], ");
