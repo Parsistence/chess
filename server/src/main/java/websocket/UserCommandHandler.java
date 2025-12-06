@@ -46,7 +46,9 @@ public class UserCommandHandler {
             var teamColor = connectionManager.getTeamColor(session, gameID);
             GameData gameData = dataAccess.getGame(gameID);
             ChessGame game = gameData.game();
-            String errorMessage = buildErrorMessage(game, teamColor);
+
+            ChessGame.TeamColor teamTurnColor = game.getTeamTurn();
+            String errorMessage = buildErrorMessage(game, teamColor, teamTurnColor);
             if (errorMessage != null) {
                 connectionManager.sendError(session, errorMessage);
                 return;
@@ -59,8 +61,9 @@ public class UserCommandHandler {
                 return;
             }
 
+            dataAccess.updateGame(gameID, game);
+
             connectionManager.broadcastGame(gameID);
-            connectionManager.sendMessage(session, "Move made successfully!");
             String username = dataAccess.getUserFromAuth(authToken).username();
             connectionManager.broadcastExcluding(username + " has made their move!", gameID, session);
 
@@ -114,12 +117,12 @@ public class UserCommandHandler {
     /**
      * Build an error message based on the game and session states.
      *
-     * @param game      The chess game.
-     * @param teamColor The team color of the session.
+     * @param game          The chess game.
+     * @param teamColor     The team color of the session.
+     * @param teamTurnColor The team color of the team whose turn it is.
      * @return A string representing the error if an error was encountered; null otherwise.
      */
-    private String buildErrorMessage(ChessGame game, ChessGame.TeamColor teamColor) {
-        ChessGame.TeamColor teamTurnColor = game.getTeamTurn();
+    private String buildErrorMessage(ChessGame game, ChessGame.TeamColor teamColor, ChessGame.TeamColor teamTurnColor) {
         String errorMessage = null;
         if (teamColor == null) {
             errorMessage = "Session is not connected as a player for this game.";
