@@ -8,6 +8,10 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
         this(gameID, null, null, gameName, new ChessGame());
     }
 
+    public GameData withPlayers(String whiteUsername, String blackUsername) {
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+    }
+
     /**
      * Get the team color of a user in the game.
      *
