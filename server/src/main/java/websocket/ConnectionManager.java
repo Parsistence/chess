@@ -99,17 +99,23 @@ public class ConnectionManager {
 
     void sendMessage(Session session, String message) throws IOException {
         var notification = new NotificationMessage(message);
-        session.getRemote().sendString(new Gson().toJson(notification));
+        sendJsonIfOpen(session, new Gson().toJson(notification));
     }
 
     void sendGame(Session session, ChessGame game) throws IOException {
         var loadGameMessage = new LoadGameMessage(game);
-        session.getRemote().sendString(new Gson().toJson(loadGameMessage));
+        sendJsonIfOpen(session, new Gson().toJson(loadGameMessage));
     }
 
     void sendError(Session session, String errorMessage) throws IOException {
         var errorServerMessage = new ErrorMessage(errorMessage);
-        session.getRemote().sendString(new Gson().toJson(errorServerMessage));
+        sendJsonIfOpen(session, new Gson().toJson(errorServerMessage));
+    }
+
+    void sendJsonIfOpen(Session session, String json) throws IOException {
+        if (session.isOpen()) {
+            session.getRemote().sendString(json);
+        }
     }
 
     /**
