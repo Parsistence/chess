@@ -43,6 +43,11 @@ public class UserCommandHandler {
      */
     public void handleMakeMove(String authToken, int gameID, ChessMove move, Session session) throws IOException {
         try {
+            if (!connectionManager.getAuthorizedSession(authToken).equals(session)) {
+                connectionManager.sendError(session, "Auth token does not match session.");
+                return;
+            }
+
             var teamColor = connectionManager.getTeamColor(session, gameID);
             GameData gameData = dataAccess.getGame(gameID);
             ChessGame game = gameData.game();
