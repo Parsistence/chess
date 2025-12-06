@@ -2,6 +2,8 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
+import io.javalin.http.Handler;
+import io.javalin.websocket.WsContext;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -13,7 +15,9 @@ import service.GameService;
 import service.TeamAlreadyTakenException;
 import service.UserService;
 import websocket.WebSocketHandler;
+import websocket.messages.ErrorMessage;
 
+import java.io.IOException;
 import java.util.Collection;
 
 public class Server {
@@ -48,20 +52,25 @@ public class Server {
                 .put("game", this::joinGame)
         ;
 
-        var webSocketHandler = new WebSocketHandler();
-        server.ws("ws", ws -> {
-            ws.onConnect(webSocketHandler);
-            ws.onMessage(webSocketHandler);
-            ws.onClose(webSocketHandler);
-        })
-        ;
-
         server.exception(EntryAlreadyExistsException.class, this::entryAlreadyExistsException)
                 .exception(EntryNotFoundException.class, this::entryNotFoundException)
                 .exception(TeamAlreadyTakenException.class, this::teamAlreadyTakenExceptionHandler)
                 .exception(DataAccessException.class, this::genericExceptionHandler)
                 .exception(Exception.class, this::genericExceptionHandler)
         ;
+
+        server.ws("ws", ws -> {
+            WebSocketHandler webSocketHandler;
+            try {
+                webSocketHandler = new WebSocketHandler();
+            } catch (DataAccessException e) {
+                throw new RuntimeException(e);
+            }
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
+        server.wsException(RuntimeException.class, this::wsGenericExceptionHandler);
     }
 
     private void joinGame(Context ctx) throws DataAccessException, TeamAlreadyTakenException {
@@ -177,6 +186,16 @@ public class Server {
 
     private void genericExceptionHandler(@NotNull Exception e, @NotNull Context ctx) {
         ctx.status(500).result("{ \"message\": \"Error: " + e + "\" }");
+    }
+
+    private void wsGenericExceptionHandler(@NotNull RuntimeException e, @NotNull WsContext ctx) {
+        try {
+            ctx.session.getRemote().sendString(
+                    serializer.toJson(new ErrorMessage("Encountered an error during websocket connection: " + e.getMessage()))
+            );
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public int run(int desiredPort) {

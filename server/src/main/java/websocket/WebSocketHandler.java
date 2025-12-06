@@ -1,6 +1,7 @@
 package websocket;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.websocket.*;
 import org.jetbrains.annotations.NotNull;
 import websocket.commands.MakeMoveCommand;
@@ -10,6 +11,9 @@ import java.io.IOException;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     UserCommandHandler commandHandler = new UserCommandHandler();
+
+    public WebSocketHandler() throws DataAccessException {
+    }
 
     /**
      * Handle websocket connection from client to server.
