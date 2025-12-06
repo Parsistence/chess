@@ -76,6 +76,6 @@ public class GameService {
                         gameData.game()
                 );
 
-        dataAccess.updateGame(gameID, updatedGame);
+        dataAccess.updateGameData(gameID, updatedGame);
     }
 }
