@@ -1,6 +1,7 @@
 package chess;
 
 import chess.ChessPiece.PieceType;
+import chess.InvalidMoveException.InvalidMoveReason;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -136,6 +137,13 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (winState != WinState.IN_PROGRESS) {
+            throw new InvalidMoveException(
+                    "The game has ended and no moves can be made.",
+                    InvalidMoveReason.GAME_ENDED
+            );
+        }
+
         // Make a copy of the board's state
         var boardClone = new ChessBoard(board);
 
