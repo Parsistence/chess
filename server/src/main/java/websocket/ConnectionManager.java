@@ -93,7 +93,6 @@ public class ConnectionManager {
 
     public void remove(String authToken, int gameID, Session session) throws DataAccessException, IOException {
         getGameConnections(gameID).remove(session);
-        sendMessage(session, "You left the game.");
         String username = dataAccess.getUserFromAuth(authToken).username();
         broadcastExcluding(username + " left the game.", gameID, session);
     }
