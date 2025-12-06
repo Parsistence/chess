@@ -85,6 +85,21 @@ public class ConnectionManager {
         broadcastExcluding(username + " left the game.", gameID, session);
     }
 
+    void sendMessage(Session session, String message) throws IOException {
+        var notification = new NotificationMessage(message);
+        session.getRemote().sendString(new Gson().toJson(notification));
+    }
+
+    void sendGame(Session session, ChessGame game) throws IOException {
+        var loadGameMessage = new LoadGameMessage(game);
+        session.getRemote().sendString(new Gson().toJson(loadGameMessage));
+    }
+
+    void sendError(Session session, String errorMessage) throws IOException {
+        var errorServerMessage = new ErrorMessage(errorMessage);
+        session.getRemote().sendString(new Gson().toJson(errorServerMessage));
+    }
+
     /**
      * Broadcasts a message to all users connected to a given game, optionally excluding a session.
      *
@@ -100,18 +115,10 @@ public class ConnectionManager {
         }
     }
 
-    void sendMessage(Session session, String message) throws IOException {
-        var notification = new NotificationMessage(message);
-        session.getRemote().sendString(new Gson().toJson(notification));
-    }
-
-    void sendGame(Session session, ChessGame game) throws IOException {
-        var loadGameMessage = new LoadGameMessage(game);
-        session.getRemote().sendString(new Gson().toJson(loadGameMessage));
-    }
-
-    void sendError(Session session, String errorMessage) throws IOException {
-        var errorServerMessage = new ErrorMessage(errorMessage);
-        session.getRemote().sendString(new Gson().toJson(errorServerMessage));
+    public void broadcastGame(int gameID) throws DataAccessException, IOException {
+        ChessGame game = dataAccess.getGame(gameID).game();
+        for (var session : getGameSessions(gameID)) {
+            sendGame(session, game);
+        }
     }
 }
