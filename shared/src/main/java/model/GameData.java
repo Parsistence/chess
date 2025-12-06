@@ -21,9 +21,9 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
     public TeamColor getTeamOfPlayer(String username) {
         TeamColor teamColor;
 
-        if (whiteUsername.equals(username)) {
+        if (whiteUsername != null && whiteUsername.equals(username)) {
             teamColor = TeamColor.WHITE;
-        } else if (blackUsername.equals(username)) {
+        } else if (blackUsername != null && blackUsername.equals(username)) {
             teamColor = TeamColor.BLACK;
         } else {
             teamColor = null;
