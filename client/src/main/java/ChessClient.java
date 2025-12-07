@@ -1,4 +1,3 @@
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessGame.TeamColor;
 import model.GameData;
@@ -289,16 +288,22 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private String promptInput(Scanner scanner) {
-        if (state != ClientState.PreLogin) {
-            System.out.print(username + " ");
-        }
-        System.out.print(">>> ");
+        printPromptString();
 
         System.out.print(SET_TEXT_COLOR_GREEN + SET_TEXT_ITALIC);
         String input = scanner.nextLine();
         System.out.print(RESET_TEXT_COLOR + RESET_TEXT_ITALIC);
 
         return input;
+    }
+
+    private void printPromptString() {
+        var prompt = "";
+        if (state != ClientState.PreLogin) {
+            prompt += username + " ";
+        }
+        prompt += ">>> ";
+        System.out.print(prompt);
     }
 
     private String buildUsageMessage(String cmd, String args) {
@@ -339,7 +344,8 @@ public class ChessClient implements ServerMessageObserver {
      */
     @Override
     public void loadGame(ChessGame game) {
-        throw new RuntimeException("Not implemented."); // TODO
+        System.out.println("\r" + boardStringRenderer.renderBoard(game.getBoard()));
+        printPromptString();
     }
 
     /**
@@ -349,7 +355,8 @@ public class ChessClient implements ServerMessageObserver {
      */
     @Override
     public void notifyError(String errorMessage) {
-        throw new RuntimeException("Not implemented."); // TODO
+        System.out.println("\r" + SET_TEXT_COLOR_RED + "Error: " + errorMessage + RESET_TEXT_COLOR);
+        printPromptString();
     }
 
     /**
@@ -359,6 +366,7 @@ public class ChessClient implements ServerMessageObserver {
      */
     @Override
     public void notify(String message) {
-        throw new RuntimeException("Not implemented."); // TODO
+        System.out.println("\r" + SET_TEXT_COLOR_GREEN + message + RESET_TEXT_COLOR);
+        printPromptString();
     }
 }
