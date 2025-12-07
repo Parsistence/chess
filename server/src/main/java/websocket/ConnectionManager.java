@@ -119,6 +119,18 @@ public class ConnectionManager {
     }
 
     /**
+     * Broadcasts a message to all users connected to a given game.
+     *
+     * @param message The message to broadcast.
+     * @param gameID  The game ID a session must be connected with to receive the broadcast.
+     */
+    public void broadcast(String message, int gameID) throws IOException {
+        for (var session : getGameSessions(gameID)) {
+            sendMessage(session, message);
+        }
+    }
+
+    /**
      * Broadcasts a message to all users connected to a given game, optionally excluding a session.
      *
      * @param message         The message to broadcast.
