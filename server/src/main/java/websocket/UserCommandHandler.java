@@ -178,7 +178,7 @@ public class UserCommandHandler {
                 connectionManager.sendError(session, "Session is not connected as a player for this game.");
                 return;
             } else if (game.getWinState() != WinState.IN_PROGRESS) {
-                connectionManager.sendError(session, "Game has ended and no moves can be made.");
+                connectionManager.sendError(session, "Cannot resign because game has ended.");
                 return;
             }
             game.resignTeam(teamColor);
