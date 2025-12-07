@@ -257,11 +257,7 @@ public class ChessClient implements ServerMessageObserver {
 
         server.joinGame(authToken, playerColor, realGameID);
 
-        return String.join("\n", List.of(
-                "Successfully joined game " + game.gameName() + " as " + playerColor + ".",
-                "Chessboard:",
-                boardStringRenderer.renderBoard(new ChessGame().getBoard(), playerColor)
-        ));
+        return "Successfully joined game " + game.gameName() + " as " + playerColor + ".";
     }
 
     private String observeGame(String[] args) throws ResponseException {
@@ -287,13 +283,9 @@ public class ChessClient implements ServerMessageObserver {
             throw new ResponseException("Error: No game found with ID " + (gameListID + 1) + ".");
         }
 
-        // Phase 6: Join as an observer
+        // TODO Phase 6: Join as an observer
 
-        return String.join("\n", List.of(
-                "Successfully joined game " + game.gameName() + " as an observer.",
-                "Chessboard:",
-                boardStringRenderer.renderBoard(new ChessGame().getBoard())
-        ));
+        return "Successfully joined game " + game.gameName() + " as an observer.";
     }
 
     private String promptInput(Scanner scanner) {
