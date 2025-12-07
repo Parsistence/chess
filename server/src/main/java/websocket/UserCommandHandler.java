@@ -62,23 +62,26 @@ public class UserCommandHandler {
 
             try {
                 game.makeMove(move);
+                dataAccess.updateGame(gameID, game);
+
+                connectionManager.broadcastGame(gameID);
+                String username = dataAccess.getUserFromAuth(authToken).username();
+                connectionManager.broadcastExcluding(username + " has made their move!", gameID, session);
+
+                broadcastGameState(gameID, session, game, gameData);
             } catch (InvalidMoveException e) {
                 connectionManager.sendError(session, e.getMessage());
-                return;
             }
 
-            dataAccess.updateGame(gameID, game);
-
-            connectionManager.broadcastGame(gameID);
-            String username = dataAccess.getUserFromAuth(authToken).username();
-            connectionManager.broadcastExcluding(username + " has made their move!", gameID, session);
-
-            var winState = game.getWinState();
-            if (winState != WinState.IN_PROGRESS) {
-                broadcastWinState(gameID, session, winState, gameData);
-            }
         } catch (DataAccessException e) {
             connectionManager.sendError(session, e.getMessage());
+        }
+    }
+
+    private void broadcastGameState(int gameID, Session session, ChessGame game, GameData gameData) throws IOException {
+        var winState = game.getWinState();
+        if (winState != WinState.IN_PROGRESS) {
+            broadcastWinState(gameID, session, winState, gameData);
         }
     }
 
