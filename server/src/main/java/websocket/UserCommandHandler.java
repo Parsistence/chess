@@ -82,6 +82,10 @@ public class UserCommandHandler {
         var winState = game.getWinState();
         if (winState != WinState.IN_PROGRESS) {
             broadcastWinState(gameID, session, winState, gameData);
+        } else if (game.isInCheck(TeamColor.WHITE)) {
+            connectionManager.broadcast(gameData.whiteUsername() + " (White) is in check!", gameID);
+        } else if (game.isInCheck(TeamColor.BLACK)) {
+            connectionManager.broadcast(gameData.blackUsername() + " (Black) is in check!", gameID);
         }
     }
 
