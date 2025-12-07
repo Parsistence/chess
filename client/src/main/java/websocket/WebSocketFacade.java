@@ -1,8 +1,12 @@
 package websocket;
 
 import chess.ChessMove;
+import com.google.gson.Gson;
 import jakarta.websocket.*;
 import server.ResponseException;
+import websocket.commands.MakeMoveCommand;
+import websocket.commands.UserGameCommand;
+import websocket.commands.UserGameCommand.CommandType;
 
 import java.io.IOException;
 import java.net.URI;
@@ -31,8 +35,10 @@ public class WebSocketFacade {
      * @param authToken The auth token of the connecting user.
      * @param gameID    The ID of the chess game to connect to.
      */
-    public void connect(String authToken, int gameID) {
-        throw new RuntimeException("Not implemented."); // TODO
+    public void connect(String authToken, int gameID) throws IOException {
+        var connectCommand = new UserGameCommand(CommandType.CONNECT, authToken, gameID);
+        String connectJson = new Gson().toJson(connectCommand);
+        sendJson(connectJson);
     }
 
     /**
@@ -42,8 +48,10 @@ public class WebSocketFacade {
      * @param gameID    The ID of the chess game to make the move on.
      * @param move      The move to make.
      */
-    public void makeMove(String authToken, int gameID, ChessMove move) {
-        throw new RuntimeException("Not implemented."); // TODO
+    public void makeMove(String authToken, int gameID, ChessMove move) throws IOException {
+        var makeMoveCommand = new MakeMoveCommand(authToken, gameID, move);
+        String makeMoveJson = new Gson().toJson(makeMoveCommand);
+        sendJson(makeMoveJson);
     }
 
     /**
@@ -52,8 +60,10 @@ public class WebSocketFacade {
      * @param authToken The auth token of the user.
      * @param gameID    The ID of the chess game to leave.
      */
-    public void leave(String authToken, int gameID) {
-        throw new RuntimeException("Not implemented."); // TODO
+    public void leave(String authToken, int gameID) throws IOException {
+        var leaveCommand = new UserGameCommand(CommandType.LEAVE, authToken, gameID);
+        String leaveJson = new Gson().toJson(leaveCommand);
+        sendJson(leaveJson);
     }
 
     /**
@@ -62,7 +72,19 @@ public class WebSocketFacade {
      * @param authToken The auth token of the user.
      * @param gameID    The ID of the chess game to leave.
      */
-    public void resign(String authToken, int gameID) {
-        throw new RuntimeException("Not implemented."); // TODO
+    public void resign(String authToken, int gameID) throws IOException {
+        var resignCommand = new UserGameCommand(CommandType.RESIGN, authToken, gameID);
+        String resignJson = new Gson().toJson(resignCommand);
+        sendJson(resignJson);
+    }
+
+    /**
+     * Sends JSON data to the server.
+     *
+     * @param json The Json data to send.
+     * @throws IOException If there was an issue sending the data.
+     */
+    private void sendJson(String json) throws IOException {
+        session.getBasicRemote().sendText(json);
     }
 }
