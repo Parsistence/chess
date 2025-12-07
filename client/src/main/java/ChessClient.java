@@ -347,7 +347,7 @@ public class ChessClient implements ServerMessageObserver {
      */
     @Override
     public void loadGame(ChessGame game) {
-
+        throw new RuntimeException("Not implemented."); // TODO
     }
 
     /**
@@ -357,7 +357,7 @@ public class ChessClient implements ServerMessageObserver {
      */
     @Override
     public void notifyError(String errorMessage) {
-
+        throw new RuntimeException("Not implemented."); // TODO
     }
 
     /**
@@ -367,6 +367,6 @@ public class ChessClient implements ServerMessageObserver {
      */
     @Override
     public void notify(String message) {
-
+        throw new RuntimeException("Not implemented."); // TODO
     }
 }
