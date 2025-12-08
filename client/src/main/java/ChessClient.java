@@ -361,6 +361,8 @@ public class ChessClient implements ServerMessageObserver {
      */
     @Override
     public void loadGame(ChessGame game) {
+        // TODO: Keep track of current team color and game board in state variables
+        // TODO: Render based on current team color
         System.out.println("\r" + boardStringRenderer.renderBoard(game.getBoard()));
         printPromptString();
     }
