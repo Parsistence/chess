@@ -265,7 +265,7 @@ public class ChessClient implements ServerMessageObserver {
             throw new ResponseException("Error: ID must be an integer.");
         }
 
-        TeamColor playerColor = switch (args[1].toLowerCase()) {
+        playerColor = switch (args[1].toLowerCase()) {
             case "white" -> TeamColor.WHITE;
             case "black" -> TeamColor.BLACK;
             default -> throw new ResponseException("Error: Second argument must be WHITE or BLACK.");
@@ -314,7 +314,14 @@ public class ChessClient implements ServerMessageObserver {
             throw new ResponseException("Error: No game found with ID " + (gameListID + 1) + ".");
         }
 
-        // TODO Phase 6: Join as an observer
+        try {
+            webSocket.connect(authToken, realGameID);
+        } catch (IOException e) {
+            throw new ResponseException("There was an issue connecting to the server via websocket.");
+        }
+
+        playerColor = TeamColor.WHITE;
+        state = ClientState.Gameplay;
 
         return "Successfully joined game " + game.gameName() + " as an observer.";
     }
