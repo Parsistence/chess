@@ -26,6 +26,7 @@ public class ChessClient implements ServerMessageObserver {
     private List<GameData> gameList;
     private ChessBoard board;
     private TeamColor playerColor = TeamColor.WHITE;
+    private int gameID;
 
     public enum ClientState {
         PRE_LOGIN, POST_LOGIN, GAMEPLAY
@@ -206,6 +207,7 @@ public class ChessClient implements ServerMessageObserver {
 
     private String logout() throws ResponseException {
         assertLoggedIn();
+        assertState(ClientState.POST_LOGIN);
 
         server.logout(authToken);
         username = "";
@@ -217,6 +219,7 @@ public class ChessClient implements ServerMessageObserver {
 
     private String createGame(String[] args) throws ResponseException {
         assertLoggedIn();
+        assertState(ClientState.POST_LOGIN);
         if (args.length < 1) {
             throw new ResponseException("Usage: " + buildUsageMessage(
                     "create", "<name>"
@@ -232,6 +235,7 @@ public class ChessClient implements ServerMessageObserver {
 
     private String listGames() throws ResponseException {
         assertLoggedIn();
+        assertState(ClientState.POST_LOGIN);
 
         gameList = List.copyOf(server.listGames(authToken));
 
@@ -261,6 +265,7 @@ public class ChessClient implements ServerMessageObserver {
 
     private String playGame(String[] args) throws ResponseException {
         assertLoggedIn();
+        assertState(ClientState.POST_LOGIN);
         if (args.length < 2) {
             throw new ResponseException("Usage: " + buildUsageMessage(
                     "play", "<ID> [WHITE|BLACK]"
@@ -279,18 +284,17 @@ public class ChessClient implements ServerMessageObserver {
             default -> throw new ResponseException("Error: Second argument must be WHITE or BLACK.");
         };
 
-        int realGameID;
         GameData game;
         try {
             game = gameList.get(gameListID);
-            realGameID = game.gameID();
+            gameID = game.gameID();
         } catch (Throwable e) {
             throw new ResponseException("Error: No game found with ID " + (gameListID + 1) + ".");
         }
 
-        server.joinGame(authToken, playerColor, realGameID);
+        server.joinGame(authToken, playerColor, gameID);
         try {
-            webSocket.connect(authToken, realGameID);
+            webSocket.connect(authToken, gameID);
         } catch (IOException e) {
             throw new ResponseException("There was an issue connecting to the server via websocket.");
         }
@@ -301,6 +305,7 @@ public class ChessClient implements ServerMessageObserver {
 
     private String observeGame(String[] args) throws ResponseException {
         assertLoggedIn();
+        assertState(ClientState.POST_LOGIN);
         if (args.length < 1) {
             throw new ResponseException("Usage: " + buildUsageMessage(
                     "observe", "<ID>"
@@ -313,19 +318,18 @@ public class ChessClient implements ServerMessageObserver {
             throw new ResponseException("Error: ID must be an integer.");
         }
 
-        int realGameID;
         GameData game;
         try {
             game = gameList.get(gameListID);
-            realGameID = game.gameID();
+            gameID = game.gameID();
         } catch (Throwable e) {
             throw new ResponseException("Error: No game found with ID " + (gameListID + 1) + ".");
         }
 
         try {
-            webSocket.connect(authToken, realGameID);
+            webSocket.connect(authToken, gameID);
         } catch (IOException e) {
-            throw new ResponseException("There was an issue connecting to the server via websocket.");
+            throwWebSocketException();
         }
 
         playerColor = TeamColor.WHITE;
@@ -336,12 +340,18 @@ public class ChessClient implements ServerMessageObserver {
 
     private String displayBoard() throws ResponseException {
         assertLoggedIn();
-        assertInGameplay();
+        assertState(ClientState.GAMEPLAY);
         return boardStringRenderer.renderBoard(board, playerColor);
     }
 
-    private String leaveGame() {
-        return null; // TODO
+    private String leaveGame() throws ResponseException {
+        try {
+            webSocket.leave(authToken, gameID);
+        } catch (IOException e) {
+            throwWebSocketException();
+        }
+        state = ClientState.POST_LOGIN;
+        return "You left the game.";
     }
 
     private String makeMove(String[] args) {
@@ -375,6 +385,10 @@ public class ChessClient implements ServerMessageObserver {
         System.out.print(prompt);
     }
 
+    private void throwWebSocketException() throws ResponseException {
+        throw new ResponseException("There was an issue connecting to the server via websocket.");
+    }
+
     private String buildUsageMessage(String cmd, String args) {
         return buildUsageMessage(cmd, args, null);
     }
@@ -405,10 +419,15 @@ public class ChessClient implements ServerMessageObserver {
         }
     }
 
-    private void assertInGameplay() throws ResponseException {
-        if (state != ClientState.GAMEPLAY) {
+    private void assertState(ClientState clientState) throws ResponseException {
+        if (state != clientState) {
+            String stateDescription = switch (clientState) {
+                case PRE_LOGIN -> "not logged in";
+                case POST_LOGIN -> "logged in (but not in game)";
+                case GAMEPLAY -> "gameplay";
+            };
             throw new ResponseException(
-                    "Error: You must be playing or observing a game to use this command."
+                    "Error: You must be in the " + stateDescription + " state to use this command."
             );
         }
     }
