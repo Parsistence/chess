@@ -3,7 +3,6 @@ package websocket;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
-import server.ResponseException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserGameCommand.CommandType;
@@ -12,7 +11,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class WebSocketFacade {
+public class WebSocketFacade extends Endpoint {
     private final Session session;
 
     public WebSocketFacade(String serverUrl, ServerMessageHandler messageHandler) {
@@ -86,5 +85,11 @@ public class WebSocketFacade {
      */
     private void sendJson(String json) throws IOException {
         session.getBasicRemote().sendText(json);
+    }
+
+    // Overridden but not used
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
+
     }
 }
