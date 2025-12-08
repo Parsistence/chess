@@ -334,8 +334,10 @@ public class ChessClient implements ServerMessageObserver {
         return "Successfully joined game " + game.gameName() + " as an observer.";
     }
 
-    private String displayBoard() {
-        return null; // TODO
+    private String displayBoard() throws ResponseException {
+        assertLoggedIn();
+        assertInGameplay();
+        return boardStringRenderer.renderBoard(board, playerColor);
     }
 
     private String leaveGame() {
@@ -399,6 +401,14 @@ public class ChessClient implements ServerMessageObserver {
         if (state == ClientState.PRE_LOGIN) {
             throw new ResponseException(
                     "Error: You are not logged in. Please log in using `login`, or create a new account using 'register'."
+            );
+        }
+    }
+
+    private void assertInGameplay() throws ResponseException {
+        if (state != ClientState.GAMEPLAY) {
+            throw new ResponseException(
+                    "Error: You must be playing or observing a game to use this command."
             );
         }
     }
