@@ -106,8 +106,25 @@ public class ChessClient implements ServerMessageObserver {
                     )
             ));
             case Gameplay -> String.join("\n", List.of(
-                    SET_TEXT_COLOR_BLUE + "====Gameplay Commands====" + RESET_TEXT_COLOR
-            )); // Phase 6: Implement these
+                    SET_TEXT_COLOR_BLUE + "====Gameplay Commands====" + RESET_TEXT_COLOR,
+                    buildUsageMessage(
+                            "displayboard",
+                            null,
+                            "Display the chessboard in its current state."
+                    ),
+                    buildUsageMessage("leave", "Leave the current game."),
+                    buildUsageMessage(
+                            "move",
+                            "<startpos> <endpos>",
+                            "Move a piece from startpos to endpos. A position should be formatted like `B4` or `b4`."
+                    ),
+                    buildUsageMessage("resign", null, "Resign from the current game."),
+                    buildUsageMessage(
+                            "showmoves",
+                            "<piecepos>",
+                            "Highlight all legal moves a piece at piecepos can make. A position should be formatted like `B4` or `b4`."
+                    )
+            ));
         };
 
         String statelessCommands = String.join("\n", List.of(
