@@ -9,6 +9,7 @@ import websocket.ServerMessageHandler;
 import websocket.ServerMessageObserver;
 import websocket.WebSocketFacade;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -280,7 +281,13 @@ public class ChessClient implements ServerMessageObserver {
         }
 
         server.joinGame(authToken, playerColor, realGameID);
+        try {
+            webSocket.connect(authToken, realGameID);
+        } catch (IOException e) {
+            throw new ResponseException("There was an issue connecting to the server via websocket.");
+        }
 
+        state = ClientState.Gameplay;
         return "Successfully joined game " + game.gameName() + " as " + playerColor + ".";
     }
 
