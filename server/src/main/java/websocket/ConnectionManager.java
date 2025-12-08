@@ -73,9 +73,9 @@ public class ConnectionManager {
         GameData game = dataAccess.getGame(gameID);
 
         UserType userType;
-        if (game.whiteUsername().equals(username)) {
+        if (game.whiteUsername() != null && game.whiteUsername().equals(username)) {
             userType = UserType.WHITE_PLAYER;
-        } else if (game.blackUsername().equals(username)) {
+        } else if (game.blackUsername() != null && game.blackUsername().equals(username)) {
             userType = UserType.BLACK_PLAYER;
         } else {
             userType = UserType.OBSERVER;
