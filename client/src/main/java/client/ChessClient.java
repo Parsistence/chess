@@ -1,3 +1,5 @@
+package client;
+
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessGame.TeamColor;
