@@ -15,7 +15,7 @@ import java.net.URISyntaxException;
 public class WebSocketFacade {
     private final Session session;
 
-    public WebSocketFacade(String serverUrl, ServerMessageHandler messageHandler) throws ResponseException {
+    public WebSocketFacade(String serverUrl, ServerMessageHandler messageHandler) {
         try {
             String wsUrl = serverUrl.replace("http", "ws");
             URI socketUri = new URI(wsUrl + "/ws");
