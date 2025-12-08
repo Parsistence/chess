@@ -1,5 +1,3 @@
-import chess.*;
-
 public class Main {
     public static void main(String[] args) {
         String serverUrl = "http://localhost:8080";
@@ -7,10 +5,13 @@ public class Main {
             serverUrl = args[0];
         }
 
+        ChessClient client;
         try {
-            new ChessClient(serverUrl).run();
+            client = new ChessClient(serverUrl);
         } catch (Throwable ex) {
             System.out.printf("Error starting up client: %s%n", ex.getMessage());
+            return;
         }
+        client.run();
     }
 }
