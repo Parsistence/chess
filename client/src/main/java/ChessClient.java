@@ -155,13 +155,22 @@ public class ChessClient implements ServerMessageObserver {
 
     private String quit() {
         if (state != ClientState.PRE_LOGIN) {
+            if (state == ClientState.GAMEPLAY) {
+                System.out.println("Leaving game...");
+                try {
+                    leaveGame();
+                    System.out.println("Successfully left game.");
+                } catch (ResponseException e) {
+                    System.out.println("Unable to leave game. Logging out without leaving game.");
+                }
+            }
             System.out.println("Logging out...");
             try {
                 server.logout(authToken);
+                System.out.println("Logout successful.");
             } catch (ResponseException e) {
                 System.out.println("Logout unsuccessful. Quitting without logging out.");
             }
-            System.out.println("Logout successful.");
         }
 
         System.out.println(SET_TEXT_BOLD + SET_TEXT_COLOR_MAGENTA + "♕ Goodbye! ♕" + RESET_TEXT_BOLD_FAINT + RESET_TEXT_COLOR);
