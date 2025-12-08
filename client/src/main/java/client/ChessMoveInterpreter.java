@@ -27,10 +27,11 @@ public class ChessMoveInterpreter {
         return new ChessPosition(row, col);
     }
 
-    public PieceType pieceTypeFromString(String pieceString) {
+    public PieceType promotionTypeFromString(String pieceString) {
         PieceType result;
         try {
-            result = promotionMap.get(pieceString.charAt(0));
+            var pieceChar = Character.toLowerCase(pieceString.charAt(0));
+            result = promotionMap.get(pieceChar);
             Assertions.assertNotNull(result);
         } catch (Exception e) {
             throw new IllegalArgumentException(
