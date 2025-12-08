@@ -63,7 +63,6 @@ public class ChessClient implements ServerMessageObserver {
         try {
             return switch (cmd) {
                 // PreLogin
-                case "quit" -> quit();
                 case "login" -> login(args);
                 case "register" -> register(args);
 
@@ -74,7 +73,16 @@ public class ChessClient implements ServerMessageObserver {
                 case "play" -> playGame(args);
                 case "observe" -> observeGame(args);
 
+                // Gameplay
+                case "displayboard" -> displayBoard();
+                case "leave" -> leaveGame();
+                case "move" -> makeMove(args);
+                case "resign" -> resign();
+                case "showmoves" -> showMoves(args);
+
+                // Stateless/Always Allowed
                 default -> help();
+                case "quit" -> quit();
             };
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR;
@@ -324,6 +332,26 @@ public class ChessClient implements ServerMessageObserver {
         state = ClientState.GAMEPLAY;
 
         return "Successfully joined game " + game.gameName() + " as an observer.";
+    }
+
+    private String displayBoard() {
+        return null; // TODO
+    }
+
+    private String leaveGame() {
+        return null; // TODO
+    }
+
+    private String makeMove(String[] args) {
+        return null; // TODO
+    }
+
+    private String resign() {
+        return null; // TODO
+    }
+
+    private String showMoves(String[] args) {
+        return null; // TODO
     }
 
     private String promptInput(Scanner scanner) {
