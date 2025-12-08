@@ -1,3 +1,4 @@
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessGame.TeamColor;
 import model.GameData;
@@ -19,6 +20,8 @@ public class ChessClient implements ServerMessageObserver {
     private String username;
     private String authToken;
     private List<GameData> gameList;
+    private ChessBoard board;
+    private TeamColor playerColor = TeamColor.WHITE;
 
     public enum ClientState {
         PreLogin, PostLogin, Gameplay
@@ -361,9 +364,8 @@ public class ChessClient implements ServerMessageObserver {
      */
     @Override
     public void loadGame(ChessGame game) {
-        // TODO: Keep track of current team color and game board in state variables
-        // TODO: Render based on current team color
-        System.out.println("\r" + boardStringRenderer.renderBoard(game.getBoard()));
+        board = game.getBoard();
+        System.out.println("\r" + boardStringRenderer.renderBoard(board, playerColor));
         printPromptString();
     }
 
