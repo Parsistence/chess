@@ -70,7 +70,7 @@ public class ChessClient implements ServerMessageObserver {
                 // PostLogin
                 case "logout" -> logout();
                 case "create" -> createGame(args);
-                case "list" -> listGames(args);
+                case "list" -> listGames();
                 case "play" -> playGame(args);
                 case "observe" -> observeGame(args);
 
@@ -222,7 +222,7 @@ public class ChessClient implements ServerMessageObserver {
         return "game " + SET_TEXT_BOLD + gameName + RESET_TEXT_BOLD_FAINT + " successfully created!";
     }
 
-    private String listGames(String[] args) throws ResponseException {
+    private String listGames() throws ResponseException {
         assertLoggedIn();
 
         gameList = List.copyOf(server.listGames(authToken));
