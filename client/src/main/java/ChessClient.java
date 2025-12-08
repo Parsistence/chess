@@ -28,14 +28,14 @@ public class ChessClient implements ServerMessageObserver {
     private TeamColor playerColor = TeamColor.WHITE;
 
     public enum ClientState {
-        PreLogin, PostLogin, Gameplay
+        PRE_LOGIN, POST_LOGIN, GAMEPLAY
     }
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
         var messageHandler = new ServerMessageHandler(this);
         webSocket = new WebSocketFacade(serverUrl, messageHandler);
-        state = ClientState.PreLogin;
+        state = ClientState.PRE_LOGIN;
     }
 
     public void run() {
@@ -83,7 +83,7 @@ public class ChessClient implements ServerMessageObserver {
 
     private String help() {
         String stateCommands = switch (state) {
-            case PreLogin -> String.join("\n", List.of(
+            case PRE_LOGIN -> String.join("\n", List.of(
                     SET_TEXT_COLOR_BLUE + "====Pre-Login Commands====" + RESET_TEXT_COLOR,
                     buildUsageMessage(
                             "login", "<username> <password>", "Log in with an existing account."
@@ -92,7 +92,7 @@ public class ChessClient implements ServerMessageObserver {
                             "register", "<username> <password> <email>", "Register a new account and log in."
                     )
             ));
-            case PostLogin -> String.join("\n", List.of(
+            case POST_LOGIN -> String.join("\n", List.of(
                     SET_TEXT_COLOR_BLUE + "====Post-Login Commands====" + RESET_TEXT_COLOR,
                     buildUsageMessage(
                             "logout", null, "Log out of the current account."
@@ -114,7 +114,7 @@ public class ChessClient implements ServerMessageObserver {
                             "Join an existing game as an observer. Run `list` first to update the list of games."
                     )
             ));
-            case Gameplay -> String.join("\n", List.of(
+            case GAMEPLAY -> String.join("\n", List.of(
                     SET_TEXT_COLOR_BLUE + "====Gameplay Commands====" + RESET_TEXT_COLOR,
                     buildUsageMessage(
                             "displayboard",
@@ -145,7 +145,7 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private String quit() {
-        if (state != ClientState.PreLogin) {
+        if (state != ClientState.PRE_LOGIN) {
             System.out.println("Logging out...");
             try {
                 server.logout(authToken);
@@ -171,7 +171,7 @@ public class ChessClient implements ServerMessageObserver {
 
         authToken = server.login(username, password);
         this.username = username;
-        state = ClientState.PostLogin;
+        state = ClientState.POST_LOGIN;
 
         return "login successful! Welcome, " + SET_TEXT_BOLD + username + RESET_TEXT_BOLD_FAINT + "!" +
                 " Type `help` for a list of post-login commands.";
@@ -190,7 +190,7 @@ public class ChessClient implements ServerMessageObserver {
 
         authToken = server.register(username, password, email);
         this.username = username;
-        state = ClientState.PostLogin;
+        state = ClientState.POST_LOGIN;
 
         return "Registration successful! You are now logged in as " + SET_TEXT_BOLD + username + RESET_TEXT_BOLD_FAINT + "." +
                 " Type `help` for a list of post-login commands.";
@@ -202,7 +202,7 @@ public class ChessClient implements ServerMessageObserver {
         server.logout(authToken);
         username = "";
         authToken = "";
-        state = ClientState.PreLogin;
+        state = ClientState.PRE_LOGIN;
 
         return "Logout successful!";
     }
@@ -287,7 +287,7 @@ public class ChessClient implements ServerMessageObserver {
             throw new ResponseException("There was an issue connecting to the server via websocket.");
         }
 
-        state = ClientState.Gameplay;
+        state = ClientState.GAMEPLAY;
         return "Successfully joined game " + game.gameName() + " as " + playerColor + ".";
     }
 
@@ -321,7 +321,7 @@ public class ChessClient implements ServerMessageObserver {
         }
 
         playerColor = TeamColor.WHITE;
-        state = ClientState.Gameplay;
+        state = ClientState.GAMEPLAY;
 
         return "Successfully joined game " + game.gameName() + " as an observer.";
     }
@@ -338,7 +338,7 @@ public class ChessClient implements ServerMessageObserver {
 
     private void printPromptString() {
         var prompt = "";
-        if (state != ClientState.PreLogin) {
+        if (state != ClientState.PRE_LOGIN) {
             prompt += username + " ";
         }
         prompt += ">>> ";
@@ -368,7 +368,7 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private void assertLoggedIn() throws ResponseException {
-        if (state == ClientState.PreLogin) {
+        if (state == ClientState.PRE_LOGIN) {
             throw new ResponseException(
                     "Error: You are not logged in. Please log in using `login`, or create a new account using 'register'."
             );
