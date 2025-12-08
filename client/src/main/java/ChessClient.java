@@ -5,7 +5,9 @@ import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
 import ui.ChessBoardStringRenderer;
+import websocket.ServerMessageHandler;
 import websocket.ServerMessageObserver;
+import websocket.WebSocketFacade;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +17,7 @@ import static ui.EscapeSequences.*;
 
 public class ChessClient implements ServerMessageObserver {
     private final ServerFacade server;
+    private final WebSocketFacade webSocket;
     private final ChessBoardStringRenderer boardStringRenderer = new ChessBoardStringRenderer();
     private ClientState state;
     private String username;
@@ -29,6 +32,8 @@ public class ChessClient implements ServerMessageObserver {
 
     public ChessClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
+        var messageHandler = new ServerMessageHandler(this);
+        webSocket = new WebSocketFacade(serverUrl, messageHandler);
         state = ClientState.PreLogin;
     }
 
