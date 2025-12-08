@@ -367,8 +367,14 @@ public class ChessClient implements ServerMessageObserver {
         return null; // TODO
     }
 
-    private String resign() {
-        return null; // TODO
+    private String resign() throws ResponseException {
+        try {
+            webSocket.resign(authToken, gameID);
+        } catch (IOException e) {
+            throwWebSocketException();
+        }
+
+        return "You resigned.";
     }
 
     private String showMoves(String[] args) {
