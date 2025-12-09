@@ -84,8 +84,8 @@ public class ChessClient implements ServerMessageObserver {
                 case "showmoves" -> showMoves(args);
 
                 // Stateless/Always Allowed
-                default -> help();
                 case "quit" -> quit();
+                default -> help();
             };
         } catch (ResponseException e) {
             return SET_TEXT_COLOR_RED + e.getMessage() + RESET_TEXT_COLOR;
@@ -411,7 +411,7 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private String resign() throws ResponseException {
-        System.out.println("Are you sure you want to resign? This will end the game. (y/n)");
+        System.out.println(SET_TEXT_COLOR_RED + "Are you sure you want to resign? This will end the game. (y/n)" + RESET_TEXT_COLOR);
         String response = promptInput(scanner);
         if (!response.isEmpty() && Character.toLowerCase(response.charAt(0)) == 'y') {
             try {
