@@ -88,7 +88,7 @@ public class ConnectionManager {
             case BLACK_PLAYER -> "the black player";
             case OBSERVER -> "an observer";
         };
-        broadcastExcluding(username + "joined the game as " + userTypeDescription + ".", gameID, session);
+        broadcastExcluding(username + " joined the game as " + userTypeDescription + ".", gameID, session);
     }
 
     public void remove(String authToken, int gameID, Session session) throws DataAccessException, IOException {
