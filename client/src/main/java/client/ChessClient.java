@@ -1,8 +1,8 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
+import chess.*;
 import chess.ChessGame.TeamColor;
+import chess.ChessPiece.PieceType;
 import model.GameData;
 import server.ResponseException;
 import server.ServerFacade;
@@ -22,11 +22,12 @@ public class ChessClient implements ServerMessageObserver {
     private final ServerFacade server;
     private final WebSocketFacade webSocket;
     private final ChessBoardStringRenderer boardStringRenderer = new ChessBoardStringRenderer();
+    private final ChessMoveInterpreter moveInterpreter = new ChessMoveInterpreter();
     private ClientState state;
     private String username;
     private String authToken;
     private List<GameData> gameList;
-    private ChessBoard board;
+    private ChessGame game;
     private TeamColor playerColor = TeamColor.WHITE;
     private int gameID;
 
@@ -352,7 +353,7 @@ public class ChessClient implements ServerMessageObserver {
     private String displayBoard() throws ResponseException {
         assertLoggedIn();
         assertState(ClientState.GAMEPLAY);
-        return boardStringRenderer.renderBoard(board, playerColor);
+        return boardStringRenderer.renderBoard(game.getBoard(), playerColor);
     }
 
     private String leaveGame() throws ResponseException {
@@ -457,8 +458,8 @@ public class ChessClient implements ServerMessageObserver {
      */
     @Override
     public void loadGame(ChessGame game) {
-        board = game.getBoard();
-        System.out.println("\r" + boardStringRenderer.renderBoard(board, playerColor));
+        this.game = game;
+        System.out.println("\r" + boardStringRenderer.renderBoard(game.getBoard(), playerColor));
         printPromptString();
     }
 
