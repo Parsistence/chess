@@ -12,9 +12,7 @@ import websocket.ServerMessageObserver;
 import websocket.WebSocketFacade;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static ui.EscapeSequences.*;
 
@@ -421,8 +419,32 @@ public class ChessClient implements ServerMessageObserver {
         return "You resigned.";
     }
 
-    private String showMoves(String[] args) {
-        return null; // TODO
+    private String showMoves(String[] args) throws ResponseException {
+        assertLoggedIn();
+        assertState(ClientState.GAMEPLAY);
+        if (args.length < 1) {
+            throw new ResponseException("Usage: " + buildUsageMessage(
+                    "showmoves",
+                    "<piecepos>",
+                    "Highlight all legal moves a piece at piecepos can make. A position should be formatted like `B4` or `b4`."
+            ));
+        }
+
+        String startPosString = args[0];
+        ChessPosition startPos;
+        Collection<ChessMove> validMoves = new HashSet<>();
+        try {
+            startPos = moveInterpreter.positionFromString(startPosString);
+            ChessPiece piece = game.getBoard().getPiece(startPos);
+            validMoves.add(new ChessMove(startPos, startPos));
+            if (piece != null && piece.getTeamColor() == playerColor) {
+                validMoves = game.validMoves(startPos);
+            }
+        } catch (Exception e) {
+            throw new ResponseException("Error: " + e.getMessage());
+        }
+
+        return boardStringRenderer.renderBoard(game.getBoard(), playerColor, validMoves);
     }
 
     private String promptInput(Scanner scanner) {
