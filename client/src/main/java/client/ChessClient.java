@@ -28,6 +28,7 @@ public class ChessClient implements ServerMessageObserver {
     private ChessGame game;
     private TeamColor playerColor = TeamColor.WHITE;
     private int gameID;
+    private Scanner scanner;
 
     public enum ClientState {
         PRE_LOGIN, POST_LOGIN, GAMEPLAY
@@ -42,7 +43,7 @@ public class ChessClient implements ServerMessageObserver {
 
     public void run() {
         System.out.println("♕ Welcome to the Chess Client! Type `help` to get started ♕");
-        var scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in);
 
         String result = "";
         while (!result.equals("quitting...")) {
@@ -410,13 +411,19 @@ public class ChessClient implements ServerMessageObserver {
     }
 
     private String resign() throws ResponseException {
-        try {
-            webSocket.resign(authToken, gameID);
-        } catch (IOException e) {
-            throwWebSocketException();
-        }
+        System.out.println("Are you sure you want to resign? This will end the game. (y/n)");
+        String response = promptInput(scanner);
+        if (!response.isEmpty() && Character.toLowerCase(response.charAt(0)) == 'y') {
+            try {
+                webSocket.resign(authToken, gameID);
+            } catch (IOException e) {
+                throwWebSocketException();
+            }
 
-        return "You resigned.";
+            return "You resigned.";
+        } else {
+            return "Resign cancelled.";
+        }
     }
 
     private String showMoves(String[] args) throws ResponseException {
