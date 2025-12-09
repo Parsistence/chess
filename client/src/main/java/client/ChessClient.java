@@ -435,11 +435,8 @@ public class ChessClient implements ServerMessageObserver {
         Collection<ChessMove> validMoves = new HashSet<>();
         try {
             startPos = moveInterpreter.positionFromString(startPosString);
-            ChessPiece piece = game.getBoard().getPiece(startPos);
             validMoves.add(new ChessMove(startPos, startPos));
-            if (piece != null && piece.getTeamColor() == playerColor) {
-                validMoves = game.validMoves(startPos);
-            }
+            validMoves = game.validMoves(startPos);
         } catch (Exception e) {
             throw new ResponseException("Error: " + e.getMessage());
         }
