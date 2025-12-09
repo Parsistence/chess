@@ -136,8 +136,9 @@ public class ChessClient implements ServerMessageObserver {
                     buildUsageMessage("leave", "Leave the current game."),
                     buildUsageMessage(
                             "move",
-                            "<startpos> <endpos>",
-                            "Move a piece from startpos to endpos. A position should be formatted like `B4` or `b4`."
+                            "<startpos> <endpos> <promotion(optional)>",
+                            "Move a piece from startpos to endpos. A position should be formatted like `B4` or `b4`.\n" +
+                                    "A valid promotion piece should be given if applicable (e.g. `q` for Queen, `k` for Knight, etc.)"
                     ),
                     buildUsageMessage("resign", null, "Resign from the current game."),
                     buildUsageMessage(
@@ -366,8 +367,48 @@ public class ChessClient implements ServerMessageObserver {
         return "You left the game.";
     }
 
-    private String makeMove(String[] args) {
-        return null; // TODO
+    private String makeMove(String[] args) throws ResponseException {
+        assertLoggedIn();
+        assertState(ClientState.GAMEPLAY);
+        if (args.length < 2) {
+            throw new ResponseException("Usage: " + buildUsageMessage(
+                    "move",
+                    "<startpos> <endpos> <promotion(optional)>",
+                    "Move a piece from startpos to endpos. A position should be formatted like `B4` or `b4`.\n" +
+                            "A valid promotion piece should be given if applicable (e.g. `q` for Queen, `k` for Knight, etc.)"
+            ));
+        }
+
+        String startPosString = args[0];
+        String endPosString = args[1];
+        ChessPosition startPos, endPos;
+        PieceType promotionPiece = null;
+        try {
+            startPos = moveInterpreter.positionFromString(startPosString);
+            endPos = moveInterpreter.positionFromString(endPosString);
+            if (args.length > 2) {
+                promotionPiece = moveInterpreter.promotionTypeFromString(args[2]);
+            }
+        } catch (Exception e) {
+            throw new ResponseException("Error: " + e.getMessage());
+        }
+
+        var move = new ChessMove(startPos, endPos, promotionPiece);
+
+        if (!game.validMoves(startPos).contains(move)) {
+            throw new ResponseException("Error: move from " + startPosString + " to " + endPosString + " is not valid.");
+        }
+
+        var pieceMoved = game.getBoard().getPiece(startPos).getPieceType();
+
+        try {
+            webSocket.makeMove(authToken, gameID, move);
+        } catch (IOException e) {
+            throwWebSocketException();
+        }
+
+        return "Moved " + pieceMoved + " from " + startPosString + " to " + endPosString +
+                ((promotionPiece != null) ? "(promoted to " + promotionPiece + ")" : "") + ".";
     }
 
     private String resign() throws ResponseException {
