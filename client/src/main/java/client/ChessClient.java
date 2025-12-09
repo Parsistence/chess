@@ -347,7 +347,7 @@ public class ChessClient implements ServerMessageObserver {
         playerColor = TeamColor.WHITE;
         state = ClientState.GAMEPLAY;
 
-        return "Successfully joined game " + game.gameName() + " as an observer.";
+        return SET_TEXT_COLOR_GREEN + "Successfully joined game " + game.gameName() + " as an observer." + RESET_TEXT_COLOR;
     }
 
     private String displayBoard() throws ResponseException {
@@ -526,7 +526,7 @@ public class ChessClient implements ServerMessageObserver {
     @Override
     public void loadGame(ChessGame game) {
         this.game = game;
-        System.out.println("\r" + boardStringRenderer.renderBoard(game.getBoard(), playerColor));
+        System.out.println("\r" + RESET_TEXT_COLOR + boardStringRenderer.renderBoard(game.getBoard(), playerColor));
         printPromptString();
     }
 
