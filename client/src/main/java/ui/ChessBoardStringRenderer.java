@@ -1,11 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
+import chess.*;
 import chess.ChessGame.TeamColor;
-import chess.ChessPiece;
-import chess.ChessPosition;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 
 import static ui.EscapeSequences.*;
@@ -55,7 +54,7 @@ public class ChessBoardStringRenderer {
      * @return The string representation of the chess board.
      */
     public String renderBoard(ChessBoard board) {
-        return renderBoardWhite(board);
+        return renderBoard(board, TeamColor.WHITE);
     }
 
     /**
@@ -66,26 +65,49 @@ public class ChessBoardStringRenderer {
      * @return The string representation of the chess board.
      */
     public String renderBoard(ChessBoard board, TeamColor teamColor) {
+        return renderBoard(board, teamColor, new HashSet<>());
+    }
+
+    /**
+     * Render a ChessBoard object as a string, from the perspective of the given team color.
+     *
+     * @param board            The board to render.
+     * @param teamColor        The perspective to render the board from
+     * @param highlightedMoves (Optional) any squares that should be highlighted on the board.
+     * @return The string representation of the chess board.
+     */
+    public String renderBoard(ChessBoard board, TeamColor teamColor, Collection<ChessMove> highlightedMoves) {
         return switch (teamColor) {
-            case WHITE -> renderBoardWhite(board);
-            case BLACK -> renderBoardBlack(board);
+            case WHITE -> renderBoardWhite(board, highlightedMoves);
+            case BLACK -> renderBoardBlack(board, highlightedMoves);
         };
     }
 
-    private String renderBoardWhite(ChessBoard board) {
+    private String renderBoardWhite(ChessBoard board, Collection<ChessMove> highlightedMoves) {
+        Collection<ChessPosition> highlightedPositions = new HashSet<>();
+        for (ChessMove highlightedMove : highlightedMoves) {
+            highlightedPositions.add(highlightedMove.getStartPosition());
+            highlightedPositions.add(highlightedMove.getEndPosition());
+        }
+
         var sb = new StringBuilder();
 
         sb.append(SET_BG_COLOR_LIGHT_GREY).append(EMPTY + " Ａ  Ｂ  Ｃ  Ｄ  Ｅ  Ｆ  Ｇ  Ｈ " + EMPTY).append(RESET_BG_COLOR + "\n");
 
         for (int r = 8; r > 0; r--) {
             var rowPieces = new String[8];
+            var areSpacesHighlighted = new boolean[8];
             for (int c = 1; c <= 8; c++) {
-                ChessPiece piece = board.getPiece(new ChessPosition(r, c));
+                ChessPosition pos = new ChessPosition(r, c);
+                ChessPiece piece = board.getPiece(pos);
                 rowPieces[c - 1] = (piece != null) ? pieceStringMap.get(piece) : EMPTY;
+                if (highlightedPositions.contains(pos)) {
+                    areSpacesHighlighted[c - 1] = true;
+                }
             }
             sb
                     .append(SET_BG_COLOR_LIGHT_GREY).append(integerFullWidthMap.get(r))
-                    .append((r % 2 == 0) ? checkeredWhite(rowPieces) : checkeredBlack(rowPieces))
+                    .append((r % 2 == 0) ? checkeredWhite(rowPieces, areSpacesHighlighted) : checkeredBlack(rowPieces, areSpacesHighlighted))
                     .append(SET_BG_COLOR_LIGHT_GREY).append(integerFullWidthMap.get(r)).append(RESET_BG_COLOR + "\n")
             ;
         }
@@ -95,35 +117,49 @@ public class ChessBoardStringRenderer {
         return sb.toString();
     }
 
-    private String checkeredWhite(String[] rowPieces) {
+    private String checkeredWhite(String[] rowPieces, boolean[] areSpacesHighlighted) {
         var sb = new StringBuilder();
 
         for (int i = 0; i < rowPieces.length; i++) {
             String piece = rowPieces[i];
-            sb
-                    .append((i % 2 == 0) ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK)
-                    .append(piece)
-            ;
+            boolean isSpaceHighlighted = areSpacesHighlighted[i];
+            if (isSpaceHighlighted) {
+                sb.append((i % 2 == 0) ? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN);
+            } else {
+                sb.append((i % 2 == 0) ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);
+            }
+            sb.append(piece);
         }
         sb.append(RESET_BG_COLOR);
 
         return sb.toString();
     }
 
-    private String renderBoardBlack(ChessBoard board) {
+    private String renderBoardBlack(ChessBoard board, Collection<ChessMove> highlightedMoves) {
+        Collection<ChessPosition> highlightedPositions = new HashSet<>();
+        for (ChessMove highlightedMove : highlightedMoves) {
+            highlightedPositions.add(highlightedMove.getStartPosition());
+            highlightedPositions.add(highlightedMove.getEndPosition());
+        }
+
         var sb = new StringBuilder();
 
         sb.append(SET_BG_COLOR_LIGHT_GREY).append(EMPTY + " Ｈ  Ｇ  Ｆ  Ｅ  Ｄ  Ｃ  Ｂ  Ａ " + EMPTY).append(RESET_BG_COLOR + "\n");
 
         for (int r = 1; r <= 8; r++) {
             var rowPieces = new String[8];
+            var areSpacesHighlighted = new boolean[8];
             for (int c = 1; c <= 8; c++) {
-                ChessPiece piece = board.getPiece(new ChessPosition(r, c));
+                ChessPosition pos = new ChessPosition(r, c);
+                ChessPiece piece = board.getPiece(pos);
                 rowPieces[8 - c] = (piece != null) ? pieceStringMap.get(piece) : EMPTY;
+                if (highlightedPositions.contains(pos)) {
+                    areSpacesHighlighted[8 - c] = true;
+                }
             }
             sb
                     .append(SET_BG_COLOR_LIGHT_GREY).append(integerFullWidthMap.get(r))
-                    .append((r % 2 == 1) ? checkeredWhite(rowPieces) : checkeredBlack(rowPieces))
+                    .append((r % 2 == 1) ? checkeredWhite(rowPieces, areSpacesHighlighted) : checkeredBlack(rowPieces, areSpacesHighlighted))
                     .append(SET_BG_COLOR_LIGHT_GREY).append(integerFullWidthMap.get(r)).append(RESET_BG_COLOR + "\n")
             ;
         }
@@ -133,15 +169,18 @@ public class ChessBoardStringRenderer {
         return sb.toString();
     }
 
-    private String checkeredBlack(String[] rowPieces) {
+    private String checkeredBlack(String[] rowPieces, boolean[] areSpacesHighlighted) {
         var sb = new StringBuilder();
 
         for (int i = 0; i < rowPieces.length; i++) {
             String piece = rowPieces[i];
-            sb
-                    .append((i % 2 == 1) ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK)
-                    .append(piece)
-            ;
+            boolean isSpaceHighlighted = areSpacesHighlighted[i];
+            if (isSpaceHighlighted) {
+                sb.append((i % 2 == 1) ? SET_BG_COLOR_GREEN : SET_BG_COLOR_DARK_GREEN);
+            } else {
+                sb.append((i % 2 == 1) ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK);
+            }
+            sb.append(piece);
         }
         sb.append(RESET_BG_COLOR);
 
